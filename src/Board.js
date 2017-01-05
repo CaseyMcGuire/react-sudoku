@@ -3,6 +3,15 @@ import React from 'react';
 class GameContainer extends React.Component {
   constructor() {
     super();
+    this.state = {
+      showErrors: false
+    }
+  }
+
+  shouldShowErrors(value) {
+      this.setState({
+        showErrors: value
+      })
   }
 
   render() {
@@ -12,14 +21,17 @@ class GameContainer extends React.Component {
         Sudoku
       </div>
       <div className="play-container">
-        <Board />
-        <ButtonPanel />
+        <Board showErrors={this.state.showErrors}/>
+        <ButtonPanel showErrors={() => this.shouldShowErrors(true)}/>
       </div>
     </div>
   );
   }
 }
 
+/*
+ * Panel that holds buttons that control the settings of the game
+ */
 class ButtonPanel extends React.Component {
   constructor() {
     super();
@@ -28,7 +40,7 @@ class ButtonPanel extends React.Component {
   render() {
     return (
       <div className="button-panel">
-        <div className="check-button" onClick={() => window.alert("button clicked!")}>
+        <div className="check-button" onClick={this.props.showErrors}>
           Check
         </div>
       </div>
@@ -43,7 +55,8 @@ class Board extends React.Component {
     constructor() {
       super();
       this.state = {
-        board: this.getEmptyBoard(getInitialBoard())
+        initialBoard: this.getEmptyBoard(getInitialBoard()),
+        currentBoard: this.getEmptyBoard(getInitialBoard())
       };
     }
     render() {
@@ -68,29 +81,63 @@ class Board extends React.Component {
 
       getRegions() {
         const regions = [];
+        const errors = this.getErrors();
+        const rowsWithErrors = [];
+        for (let i = 0; i < errors.length; i++) {
+          rowsWithErrors.push(errors[i].y);
+        }
+        console.log(rowsWithErrors);
+        console.log(errors);
         for (let row = 0; row < 3; row++) {
           for (let column = 0; column < 3; column++) {
-            regions.push(this.getRegion(row, column));
+            regions.push(this.getRegion(row, column, errors));
           }
         }
         return regions;
       }
 
       /**
-      *
-      */
-      getRegion(x, y) {
+       * Returns a single region of the Sudoku board.
+       *
+       *   -------------------------------------
+       *   |           |           |           |
+       *   |   (0,0)   |    (1,0)  |   (2,0)   |
+       *   |           |           |           |
+       *   -------------------------------------
+       *   |           |           |           |
+       *   |   (0,1)   |    (1,1)  |   (2,1)   |
+       *   |           |           |           |
+       *   -------------------------------------
+       *   |           |           |           |
+       *   |   (0,2)   |    (1,2)  |   (2,2)   |
+       *   |           |           |           |
+       *   -------------------------------------
+       *
+       *
+       * @param {number} x The x-coordinate of the region (between 0 and 2)
+       * @param {number} y The y-coordinate of the region (between 0 and 2)
+       * @return {Region} The region of the board at the specified coordinate
+       */
+      getRegion(x, y, errors) {
         const rowOffset = x === 0 ? 0 : x === 1 ? 3 : 6;
         const columnOffset = y === 0 ? 0 : y === 1 ? 3 : 6;
         const squares = Array(9).fill(null);
         let iter = 0;
-        for (let i = rowOffset; i < rowOffset + 3 ; i++) {
-          for (let j = columnOffset; j < columnOffset + 3; j++) {
-            squares[iter] = this.state.board[i][j];
+        for (let row = rowOffset; row < rowOffset + 3 ; row++) {
+          for (let column = columnOffset; column < columnOffset + 3; column++) {
+            const key = '(' + column + ',' + row + ')';
+            const rowErrors = this.getRowErrors(column, row);
+            const hasError = rowErrors.length > 0;
+
+            squares[iter] = <Square key={key} 
+                                    hasError={hasError}
+                                    initialNumber={this.state.initialBoard[row][column]}
+                                    currentNumber={this.getBoardValue(column, row)} 
+                                    onSquareChange={(value) => this.setBoardValue(column, row, value)}/>
             iter++;
           }
         }
-        const key = '(' + x + ',' + y + ')';
+        const key = '(' + y + ',' + x + ')';
         return (
           <Region key={key} squares={squares} />
         )
@@ -102,18 +149,70 @@ class Board extends React.Component {
         for (let i = 0; i < board.length; i++) {
           board[i] = Array(9).fill(null);
           for (let j = 0; j < board[i].length; j++) {
-            const key = '(' + i + ',' + j + ')';
-            board[i][j] = <Square key={key} initialNumber={initialBoard[i][j]} />
+            board[i][j] = initialBoard[i][j];
           }
         }
         return board;
       }
+
+      getRowErrors(x, y) {
+        const currentNumber = this.getBoardValue(x, y);
+        const errors = [];
+        if (!currentNumber) {
+          return errors;
+        }
+        for (let curX = 0; curX < 9; curX++) {
+          if (curX === x) {
+            continue;
+          }
+          const valueInRow = this.getBoardValue(curX, y);
+          if (valueInRow === currentNumber && this.getInitialBoardValue(curX, y)) {
+            errors.push(new Error(curX, y));
+          }
+        }
+        return errors;
+      }
+
+      checkColumn(x, y) {
+        return {};
+      }
+
+      checkRegion(x, y) {
+        return {};
+      }
+
+      getInitialBoardValue(x, y) {
+        return this.state.initialBoard[y][x];
+      }
+
+      getBoardValue(x, y) {
+        return this.state.currentBoard[y][x];
+      }
+
+      setBoardValue(x, y, value) {
+        this.state.currentBoard[y][x] = value;
+      }
+
+
+      getErrors() {
+        let errors = [];
+        for (let i = 0; i < this.state.currentBoard.length; i++) {
+          for (let j = 0; j < this.state.currentBoard[i].length; j++) {
+            const rowError = this.getRowErrors(i, j);
+            if (rowError.length > 0) {
+              errors = errors.concat(rowError);
+            }
+          }
+        }
+        return errors;
+      }
+
 }
 
 
 
 /**
-  * A single 9x9 square in a Sudoku board.
+  * A single 3x3 region in a Sudoku board.
   */
 class Region extends React.Component {
   render() {
@@ -126,7 +225,9 @@ class Region extends React.Component {
 
 }
 
-
+/**
+ * A single square in the Sudoku board.
+ */
 class Square extends React.Component {
   constructor() {
     super();
@@ -146,15 +247,22 @@ class Square extends React.Component {
       this.setState({
         number: userInput
       })
+      this.props.onSquareChange(userInput);
     }
   }
+
+  /** @return True if the passed input string is a valid input for a Sudoku square
+              e.g. is an empty string or a 1 digit non-zero number */
   isValidInput(input) {
     return input === '' ||
-    input && input.length === 1 && this.isNumeric(input);
+    input && input.length === 1 && this.isNumeric(input) && input !== '0';
   }
+
+ /** @return True if the passed string is a number. */
   isNumeric(str) {
     return !isNaN(parseFloat(str)) && isFinite(str);
   }
+
   render() {
     let inputField;
     const isInitialSquare = this.props.initialNumber !== '';
@@ -172,7 +280,7 @@ class Square extends React.Component {
     }
 
     return (
-      <div className={"square" + (isInitialSquare ? " immutable-square" : "")}
+      <div className={"square" + (isInitialSquare ? " immutable-square" : "") + (this.props.hasError ? " primary-error-square" : "")}
            onClick={() => this.handleClick(true)}
            onBlur={() => this.handleClick(false)}>
         {inputField}
@@ -181,7 +289,7 @@ class Square extends React.Component {
   }
 }
 
-//test
+//test board. Replace with ajax call eventually
 function getInitialBoard() {
   return [
     ["", "", "", "", "", "", "", "", ""],
@@ -196,4 +304,10 @@ function getInitialBoard() {
   ]
 }
 
+class Error {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+  }
+}
 export default GameContainer;
