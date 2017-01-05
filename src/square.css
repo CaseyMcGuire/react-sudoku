@@ -1,0 +1,43 @@
+.square {
+  width: calc(100% / 3);
+  height: calc(100% / 3);
+  float: left;
+  text-align: center;
+  border: solid #d9d9d9;
+  border-width: thin;
+  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-size: 25px;
+}
+
+.input-field {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  font-family: inherit;
+  font-size: inherit;
+  box-shadow: none;
+  border: none;
+}
+
+.input-field:focus {
+  outline: none;
+}
+
+.number-container {
+    padding-top: 28%; /* Centers the number vertically. Number determined from trial-and-error ;) */
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.immutable-square {
+  color: 	#595959;
+  background-color: #f2f2f2;
+}
+
+.primary-error-square {
+  background-color: #BF120D;
+}
+
+.secondary-error-square {
+  background-color: #BF7A76;
+}

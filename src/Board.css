@@ -1,0 +1,19 @@
+
+.board {
+  width: 600px;
+  height: 600px;
+  font-size: 20px;
+  margin: 0 auto;
+}
+
+.row {
+  width: 100%;
+  height: 33.33333%;
+}
+
+.region {
+  height: 100%;
+  width: calc(100% / 3);
+  float: left;
+  border: 0.5px solid black;
+}
