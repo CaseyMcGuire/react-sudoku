@@ -35,7 +35,8 @@
 }
 
 .primary-error-square {
-  background-color: #BF120D;
+  background-color: #BF120D;  
+  border: solid #BF6260 thin;
 }
 
 .secondary-error-square {

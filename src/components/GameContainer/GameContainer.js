@@ -1,6 +1,6 @@
 import React from 'react';
-import Board from '../board/Board';
-import ButtonPanel from './ButtonPanel';
+import Board from '../Board/Board';
+import ButtonPanel from '../ButtonPanel/ButtonPanel';
 import './GameContainer.css';
 
 export default class GameContainer extends React.Component {
