@@ -37,12 +37,6 @@ export default class Board extends React.Component {
       getRegions() {
         const regions = [];
         const errors = this.getErrors();
-        const rowsWithErrors = [];
-        for (let i = 0; i < errors.length; i++) {
-          rowsWithErrors.push(errors[i].y);
-        }
-        console.log(rowsWithErrors);
-        console.log(errors);
         for (let row = 0; row < 3; row++) {
           for (let column = 0; column < 3; column++) {
             regions.push(this.getRegion(row, column, errors));
@@ -81,8 +75,7 @@ export default class Board extends React.Component {
         for (let row = rowOffset; row < rowOffset + 3 ; row++) {
           for (let column = columnOffset; column < columnOffset + 3; column++) {
             const key = '(' + column + ',' + row + ')';
-            const rowErrors = this.getRowErrors(column, row);
-            const hasError = rowErrors.length > 0;
+            const hasError = this.hasError(column, row, errors);
 
             squares[iter] = <Square key={key} 
                                     hasError={hasError}
@@ -110,6 +103,30 @@ export default class Board extends React.Component {
         return board;
       }
 
+      hasError(x, y, errors) {
+        for (let error of errors) {
+          if (error.x === x && error.y === y) {
+            return true;
+          }
+        }
+        return false;
+      }
+      
+      getErrors() {
+        let errors = [];
+        for (let i = 0; i < this.state.currentBoard.length; i++) {
+          for (let j = 0; j < this.state.currentBoard[i].length; j++) {
+            const currentSquareErrors = this.getRowErrors(i, j).concat(this.getColumnErrors(i, j)).concat(this.getRegionErrors(i, j));
+            if (currentSquareErrors.length > 0) {
+              errors = errors.concat(currentSquareErrors);
+            }
+          }
+        }
+        return errors;
+      }
+
+      //TODO: The code to check rows and columns is super similar... See if the logic
+      //can be combined somehow...
       getRowErrors(x, y) {
         const currentNumber = this.getBoardValue(x, y);
         const errors = [];
@@ -121,19 +138,58 @@ export default class Board extends React.Component {
             continue;
           }
           const valueInRow = this.getBoardValue(curX, y);
-          if (valueInRow === currentNumber && this.getInitialBoardValue(curX, y)) {
+          //right now, we will say this square constitutes an error iff: 
+          //  1) it duplicates another number in this row, and
+          //  2) it was *not* part of the initial board (since we only want to highlight user errors)
+          if (valueInRow === currentNumber && !this.getInitialBoardValue(curX, y)) {
             errors.push(new Error(curX, y));
           }
         }
         return errors;
       }
 
-      checkColumn(x, y) {
-        return [];
+      getColumnErrors(x, y) {
+        const currentNumber = this.getBoardValue(x, y);
+        const errors = [];
+        if (!currentNumber) {
+          return errors;
+        }
+        for (let curY = 0; curY < 9; curY++) {
+          if (curY === y) {
+            continue;
+          }
+          const valueInRow = this.getBoardValue(x, curY);
+          if (valueInRow === currentNumber && !this.getInitialBoardValue(x, curY)) {
+            errors.push(new Error(x, curY));
+          }
+        }
+        return errors;
       }
 
-      checkRegion(x, y) {
-        return [];
+      getRegionErrors(x, y) {
+        const currentNumber = this.getBoardValue(x, y);
+        const errors = [];
+        if (!currentNumber) {
+          return errors;
+        }
+        
+        //get the top-left coordinate of whichever region this square is in
+        const rowOffset = x < 3 ? 0 : x < 6 ? 3 : 6;
+        const columnOffset = y < 3 ? 0 : y < 6 ? 3 : 6;
+        for (let row = rowOffset; row < rowOffset + 3; row++) {
+          for (let column = columnOffset; column < columnOffset + 3; column++) {
+            if (x === column && y === row) {
+              continue;
+            }
+            
+            const value = this.getBoardValue(column, row);
+            if (value === currentNumber && !this.getInitialBoardValue(column, row)) {
+              errors.push(new Error(column, row));
+            }
+          }
+        }
+
+        return errors;
       }
 
       getInitialBoardValue(x, y) {
@@ -147,21 +203,6 @@ export default class Board extends React.Component {
       setBoardValue(x, y, value) {
         this.state.currentBoard[y][x] = value;
       }
-
-
-      getErrors() {
-        let errors = [];
-        for (let i = 0; i < this.state.currentBoard.length; i++) {
-          for (let j = 0; j < this.state.currentBoard[i].length; j++) {
-            const rowError = this.getRowErrors(i, j);
-            if (rowError.length > 0) {
-              errors = errors.concat(rowError);
-            }
-          }
-        }
-        return errors;
-      }
-
 }
 
 
