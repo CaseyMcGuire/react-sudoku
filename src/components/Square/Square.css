@@ -30,12 +30,18 @@
 }
 
 .immutable-square {
+  height: 100%;
   color: 	#595959;
   background-color: #f2f2f2;
 }
 
 .primary-error-square {
+  height: 100%;
   background-color: #BF120D;  
+}
+
+.primary-error-square .number-container {
+  height: 100%;
   border: solid #BF6260 thin;
 }
 

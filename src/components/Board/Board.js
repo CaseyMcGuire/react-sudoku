@@ -203,6 +203,25 @@ export default class Board extends React.Component {
       setBoardValue(x, y, value) {
         this.state.currentBoard[y][x] = value;
       }
+
+      /** @return True iff this sudoku puzzle is solved */
+      isSolved() {
+        //if there are any errors, then (obviously) the puzzle isn't solved
+        const errors = this.getErrors();
+        if (errors) {
+          return false;
+        }
+        
+        //if any square doesn't have an entry, then the puzzle can't be solved.
+        for (let i = 0; i < this.state.currentBoard; i++) {
+          for (let j = 0; j < this.state.currentBoard[i]; j++) {
+            if (!this.state.currentBoard[i][j]) {
+              return false;
+            }
+          }
+        }
+        return true;
+      }
 }
 
 
