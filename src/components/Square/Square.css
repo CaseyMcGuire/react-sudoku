@@ -9,6 +9,19 @@
   font-size: 25px;
 }
 
+/* refactor this! */
+.little-square {
+  width: calc(100% / 3);
+  height: calc(100% / 3);
+  float: left;
+  text-align: center;
+  font-size: 15px;
+}
+
+.hide-square {
+  visibility: hidden;
+}
+
 .input-field {
   width: 100%;
   height: 100%;

@@ -46,11 +46,13 @@ export default class Square extends React.Component {
     if (isInitialSquare) {
       inputField = <ImmutableSquare number={this.props.initialNumber} />
     }
-    else if (this.state.isSelected && !this.props.initialNumber) {
-      inputField = <SelectedMutableSquare number={this.state.number} handleChange={(event) => this.handleChange(event)} />
-    }
+    //else if (this.state.isSelected && !this.props.initialNumber) {
+//      inputField = <SelectedMutableSquare number={this.state.number} 
+                                          //handleChange={(event) => this.handleChange(event)} />
+    //}
     else {
-      inputField = <UnselectedMutableSquare number={this.state.number} hasError={this.props.hasError} /> 
+      inputField =<CandidateSquare />// <UnselectedMutableSquare number={this.state.number} 
+                    //                        hasError={this.props.hasError} /> 
     }
 
     return (
@@ -95,7 +97,42 @@ function UnselectedMutableSquare(props) {
   );
 }
 
-//TODO
-function CandidateSquare(props) {
+class CandidateSquare extends React.Component {
+  constructor() {
+    super();
 
+  }
+  render() {
+        let candidateSquares =  [...Array(9).keys()].map(i => <SingleCandidateSquare key={i} number={i + 1} />);
+      return (
+        //TODO: remove inline style
+        <div style={{height: "100%"}}>
+          {candidateSquares}
+         </div>
+      );
+    }
+}
+
+class SingleCandidateSquare extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      isSelected: true
+    };
+  }
+
+  render() {
+    return (
+      <div className={"little-square" + (!this.state.isSelected ? ' hide-square' : '')} onClick={() => this.handleClick(!this.state.isSelected) }>
+        {this.props.number}
+      </div>
+    );
+  }
+
+  handleClick(selected) {
+    console.log('click');
+    this.setState({
+      isSelected: !this.state.isSelected
+    })
+  }
 }
