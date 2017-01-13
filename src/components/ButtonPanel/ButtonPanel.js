@@ -15,6 +15,9 @@ export default class ButtonPanel extends React.Component {
         <div className="check-button" onClick={this.props.showErrors}>
           Check
         </div>
+        <div className="square-type-container">
+          
+        </div>
       </div>
     )
   }

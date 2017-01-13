@@ -1,20 +1,24 @@
+
 .square {
   width: calc(100% / 3);
   height: calc(100% / 3);
   float: left;
   text-align: center;
+}
+
+.sudoku-square {
   border: solid #d9d9d9;
   border-width: thin;
   font-family: "Comic Sans MS", cursive, sans-serif;
   font-size: 25px;
 }
 
+.candidate-squares-container {
+  height: 100%;
+}
+
 /* refactor this! */
-.little-square {
-  width: calc(100% / 3);
-  height: calc(100% / 3);
-  float: left;
-  text-align: center;
+.single-candidate-square {
   font-size: 15px;
 }
 

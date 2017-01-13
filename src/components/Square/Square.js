@@ -10,7 +10,8 @@ export default class Square extends React.Component {
     super();
     this.state = {
       isSelected: false, /* Whether this is the square the user is currently changing */
-      number: ''         /* The number in this square. */
+      number: '',         /* The number in this square. */
+      isCandidateSquare: false /* */
     };
   }
   handleClick(isSelected) {
@@ -56,7 +57,7 @@ export default class Square extends React.Component {
     }
 
     return (
-      <div className="square"
+      <div className="square sudoku-square"
            onClick={() => this.handleClick(true)}
            onBlur={() => this.handleClick(false)}>
         {inputField}
@@ -103,10 +104,11 @@ class CandidateSquare extends React.Component {
 
   }
   render() {
-        let candidateSquares =  [...Array(9).keys()].map(i => <SingleCandidateSquare key={i} number={i + 1} />);
+      //create an array of candidate squares filled with the numbers from 1 to 9. This will be the 3x3 grid
+      let candidateSquares =  [...Array(9).keys()].map(i => <SingleCandidateSquare key={i} number={i + 1} />);
       return (
         //TODO: remove inline style
-        <div style={{height: "100%"}}>
+        <div className="candidate-squares-container">
           {candidateSquares}
          </div>
       );
@@ -117,20 +119,21 @@ class SingleCandidateSquare extends React.Component {
   constructor() {
     super();
     this.state = {
-      isSelected: true
+      isSelected: false
     };
   }
 
   render() {
+    //if this square isn't selected, we don't want to show anything
+    const number = this.state.isSelected ? this.props.number : '';
     return (
-      <div className={"little-square" + (!this.state.isSelected ? ' hide-square' : '')} onClick={() => this.handleClick(!this.state.isSelected) }>
-        {this.props.number}
+      <div className="square single-candidate-square" onClick={() => this.handleClick() }>
+        {number}
       </div>
     );
   }
 
-  handleClick(selected) {
-    console.log('click');
+  handleClick() {
     this.setState({
       isSelected: !this.state.isSelected
     })
