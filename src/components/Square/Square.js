@@ -11,7 +11,7 @@ export default class Square extends React.Component {
     this.state = {
       isSelected: false, /* Whether this is the square the user is currently changing */
       number: '',         /* The number in this square. */
-      isCandidateSquare: false /* */
+      isCandidateSquare: false /* Whether this square is currently in candidate square mode or not. */
     };
   }
   handleClick(isSelected) {
@@ -107,7 +107,6 @@ class CandidateSquare extends React.Component {
       //create an array of candidate squares filled with the numbers from 1 to 9. This will be the 3x3 grid
       let candidateSquares =  [...Array(9).keys()].map(i => <SingleCandidateSquare key={i} number={i + 1} />);
       return (
-        //TODO: remove inline style
         <div className="candidate-squares-container">
           {candidateSquares}
          </div>
@@ -119,7 +118,7 @@ class SingleCandidateSquare extends React.Component {
   constructor() {
     super();
     this.state = {
-      isSelected: false
+      isSelected: false /* if this candidate square is selected, its number is displayed. */
     };
   }
 

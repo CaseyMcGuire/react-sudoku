@@ -12,11 +12,18 @@ export default class ButtonPanel extends React.Component {
   render() {
     return (
       <div className="button-panel">
-        <div className="check-button" onClick={this.props.showErrors}>
-          Check
+        <div className="button-container check-button-container">
+          <div className="check-button" onClick={this.props.showErrors}>
+            Check
+          </div>
         </div>
-        <div className="square-type-container">
-          
+        <div className="button-container square-mode-container">
+          <div className="candidate-mode-button">
+            Candidate Mode
+          </div>
+          <div className="fill-mode-button">
+            Fill Mode
+          </div>
         </div>
       </div>
     )
