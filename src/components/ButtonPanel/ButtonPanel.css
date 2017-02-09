@@ -3,6 +3,7 @@
   height: 50px;
   margin: 0 auto;
   border: 1px solid;
+  font-family: Arial;
 }
 
 .button-container {
@@ -15,12 +16,36 @@
 }
 
 .check-button {
-  height: 25px;
-  width: 50px;
-  background-color: #3894FF;
+
+  height: 35px;
+  width: 65px;
+  background-color: #1F7BE6;
   border-radius: 5px;
+  border: none;
+  margin: 0 auto;
+  line-height: 30px;  /* needs to be same as the height of the button */
+  text-align: center;
+  color: #FFFFFF;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 17px;
+  text-decoration: none;
+}
+
+.check-button:hover {
+  background-color: #3894FF;
 }
 
 .square-mode-container {
-  width: 40%;
+  width: 50%;
+}
+
+.mode-button {
+  width: 50%;
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+}
+
+.mode-button.selected {
+  background-color: red;
 }

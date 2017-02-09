@@ -7,7 +7,8 @@ export default class GameContainer extends React.Component {
   constructor() {
     super();
     this.state = {
-      showErrors: false
+      showErrors: false,
+      isFillMode: true
     }
   }
 
@@ -17,6 +18,12 @@ export default class GameContainer extends React.Component {
       })
   }
 
+  setMode(isFillMode) {
+    this.setState({
+      isFillMode: isFillMode
+    });
+  }
+
   render() {
     return (
     <div className="game-container">
@@ -24,8 +31,11 @@ export default class GameContainer extends React.Component {
         Sudoku
       </div>
       <div className="play-container">
-        <Board showErrors={this.state.showErrors}/>
-        <ButtonPanel showErrors={() => this.shouldShowErrors(true)}/>
+        <Board showErrors={this.state.showErrors} isFillMode={this.state.isFillMode}/>
+        <ButtonPanel showErrors={() => this.shouldShowErrors(true)} 
+                     isFillMode={this.state.isFillMode}
+                     handleModeChange={(isFillMode) => this.setMode(isFillMode)}
+                     />
       </div>
     </div>
   );

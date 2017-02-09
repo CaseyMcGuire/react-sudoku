@@ -11,7 +11,8 @@ export default class Square extends React.Component {
     this.state = {
       isSelected: false, /* Whether this is the square the user is currently changing */
       number: '',         /* The number in this square. */
-      isCandidateSquare: false /* Whether this square is currently in candidate square mode or not. */
+      isCandidateSquare: false, /* Whether this square is currently in candidate square mode or not. */
+      candidateSquares: Array(9).fill(false)
     };
   }
   handleClick(isSelected) {
@@ -41,19 +42,44 @@ export default class Square extends React.Component {
     return !isNaN(parseFloat(str)) && isFinite(str);
   }
 
+/**
+ *  Record the toggling of a candidate square
+ * 
+ * @param {number} The index of the candidate square that was clicked (off by one such that if 1 was toggled, the index would be 0)
+ */
+  handleCandidateSquareClick(i) {
+    if (this.props.isFillMode) {
+      return;
+    }
+    const candidateSquares = this.state.candidateSquares.slice();
+    candidateSquares[i] = !candidateSquares[i];
+    this.setState({
+      candidateSquares: candidateSquares
+    })
+  }
+
+  hasAnyCandidateSquares() {
+    return this.state.candidateSquares.reduce((acc, isSelected) => acc || isSelected)
+  }
+
   render() {
     let inputField;
     const isInitialSquare = this.props.initialNumber !== '';
+    const isCandidateMode = !this.props.isFillMode;
     if (isInitialSquare) {
       inputField = <ImmutableSquare number={this.props.initialNumber} />
     }
-    //else if (this.state.isSelected && !this.props.initialNumber) {
-//      inputField = <SelectedMutableSquare number={this.state.number} 
-                                          //handleChange={(event) => this.handleChange(event)} />
-    //}
+    else if (this.state.isSelected && this.props.isFillMode) {
+      inputField = <SelectedMutableSquare number={this.state.number} 
+                                          handleChange={(event) => this.handleChange(event)} />
+    }
+    else if (!this.state.number && (this.hasAnyCandidateSquares() || isCandidateMode)) {
+      inputField = <CandidateSquare candidateSquares={this.state.candidateSquares}
+                                    handleCandidateSquareClick={(i) => this.handleCandidateSquareClick(i)} />
+    }
     else {
-      inputField =<CandidateSquare />// <UnselectedMutableSquare number={this.state.number} 
-                    //                        hasError={this.props.hasError} /> 
+      inputField =  <UnselectedMutableSquare number={this.state.number} 
+                                             hasError={this.props.hasError} /> 
     }
 
     return (
@@ -101,11 +127,13 @@ function UnselectedMutableSquare(props) {
 class CandidateSquare extends React.Component {
   constructor() {
     super();
-
   }
   render() {
       //create an array of candidate squares filled with the numbers from 1 to 9. This will be the 3x3 grid
-      let candidateSquares =  [...Array(9).keys()].map(i => <SingleCandidateSquare key={i} number={i + 1} />);
+      let candidateSquares =  [...Array(9).keys()].map(i => <SingleCandidateSquare key={i} 
+                                                                                   number={i + 1} 
+                                                                                   isSelected={this.props.candidateSquares[i]} 
+                                                                                   handleClick={() => this.props.handleCandidateSquareClick(i)} />);
       return (
         <div className="candidate-squares-container">
           {candidateSquares}
@@ -117,24 +145,16 @@ class CandidateSquare extends React.Component {
 class SingleCandidateSquare extends React.Component {
   constructor() {
     super();
-    this.state = {
-      isSelected: false /* if this candidate square is selected, its number is displayed. */
-    };
   }
 
   render() {
     //if this square isn't selected, we don't want to show anything
-    const number = this.state.isSelected ? this.props.number : '';
+    const number = this.props.isSelected ? this.props.number : '';
     return (
-      <div className="square single-candidate-square" onClick={() => this.handleClick() }>
+      <div className="square single-candidate-square" onClick={() => this.props.handleClick() }>
         {number}
       </div>
     );
   }
 
-  handleClick() {
-    this.setState({
-      isSelected: !this.state.isSelected
-    })
-  }
 }

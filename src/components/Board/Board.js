@@ -11,7 +11,7 @@ export default class Board extends React.Component {
       super();
       this.state = {
         initialBoard: this.getEmptyBoard(getInitialBoard()),
-        currentBoard: this.getEmptyBoard(getInitialBoard())
+        currentBoard: this.getEmptyBoard(getInitialBoard()),
       };
     }
     render() {
@@ -81,7 +81,9 @@ export default class Board extends React.Component {
                                     hasError={hasError}
                                     initialNumber={this.state.initialBoard[row][column]}
                                     currentNumber={this.getBoardValue(column, row)} 
-                                    onSquareChange={(value) => this.setBoardValue(column, row, value)}/>
+                                    onSquareChange={(value) => this.setBoardValue(column, row, value)}
+                                    onSquareSelection={() => console.log("hello world")}
+                                    isFillMode={this.props.isFillMode} />
             iter++;
           }
         }
