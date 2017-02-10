@@ -13,13 +13,22 @@ export default class ButtonPanel extends React.Component {
     return (
       <div className="button-panel">
         <div className="button-container check-button-container">
-          <button className="check-button" onClick={this.props.showErrors}>
+          <button className="check-button" title="Check your current solution for errors" onClick={this.props.showErrors}>
             Check
           </button>
         </div>
         <div className="button-container square-mode-container">
-          <FillButton onClick={() => this.props.handleModeChange(true)} isFillMode={this.props.isFillMode} />
-          <CandidateButton onClick={() => this.props.handleModeChange(false)} isFillMode={this.props.isFillMode}/>
+          <div className="single-mode-button-container"> 
+            <FillButton onClick={() => this.props.handleModeChange(true)} isFillMode={this.props.isFillMode} />
+          </div>
+          <div className="single-mode-button-container">
+             <CandidateButton onClick={() => this.props.handleModeChange(false)} isFillMode={this.props.isFillMode}/>
+          </div>
+        </div>
+        <div className="button-container">
+          <div className="gear-button">
+            &#9881;
+          </div>
         </div>
       </div>
     )
@@ -29,7 +38,7 @@ export default class ButtonPanel extends React.Component {
 function FillButton(props) {
   const styleNames = "mode-button fill-mode-button" + (props.isFillMode ? " selected" : "");
   return (
-    <div className={styleNames} onClick={props.onClick}>
+    <div title="Fill Mode" className={styleNames} onClick={props.onClick}>
       F
     </div>
   );
@@ -38,7 +47,7 @@ function FillButton(props) {
 function CandidateButton(props) {
   const styleNames = "mode-button fill-mode-button" + (!props.isFillMode ? " selected" : "");
   return (
-    <div className={styleNames} onClick={props.onClick}>
+    <div title="Candidate Mode" className={styleNames} onClick={props.onClick}>
       C
     </div>
   );

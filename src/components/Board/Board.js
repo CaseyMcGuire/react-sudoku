@@ -78,7 +78,7 @@ export default class Board extends React.Component {
             const hasError = this.hasError(column, row, errors);
 
             squares[iter] = <Square key={key} 
-                                    hasError={hasError}
+                                    hasError={hasError && this.props.showErrors}
                                     initialNumber={this.state.initialBoard[row][column]}
                                     currentNumber={this.getBoardValue(column, row)} 
                                     onSquareChange={(value) => this.setBoardValue(column, row, value)}

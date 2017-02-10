@@ -16,13 +16,14 @@
 }
 
 .check-button {
-
   height: 35px;
   width: 65px;
   background-color: #1F7BE6;
   border-radius: 5px;
   border: none;
+  display: block;
   margin: 0 auto;
+  margin-top: 5px; /* This will need to change if the height of the button panel changes*/
   line-height: 30px;  /* needs to be same as the height of the button */
   text-align: center;
   color: #FFFFFF;
@@ -36,16 +37,30 @@
 }
 
 .square-mode-container {
+  width: 23%;
+  border-left: 1px solid #000000;
+}
+
+.single-mode-button-container {
   width: 50%;
+  display: inline-block;
 }
 
 .mode-button {
-  width: 50%;
-  display: inline-block;
-  text-align: center;
+  margin: 0 auto;
   cursor: pointer;
+  margin-top: 3px;
+  color: #4B7DBF;
+  text-align: center;
+  width: 50px;
 }
 
 .mode-button.selected {
-  background-color: red;
+  color: #FFFFFF;
+  background-color: #4B7DBF;
+  border-radius: 10px;
+}
+
+.fill-mode-button {
+  font-size: 35px;
 }

@@ -12,7 +12,7 @@ export default class Square extends React.Component {
       isSelected: false, /* Whether this is the square the user is currently changing */
       number: '',         /* The number in this square. */
       isCandidateSquare: false, /* Whether this square is currently in candidate square mode or not. */
-      candidateSquares: Array(9).fill(false)
+      candidateSquares: Array(9).fill(false) /* Store the toggle state of this square if it was ever in candidate mode */
     };
   }
   handleClick(isSelected) {
@@ -58,6 +58,7 @@ export default class Square extends React.Component {
     })
   }
 
+/** @return True if any of this square's candidate squares have been selected. */
   hasAnyCandidateSquares() {
     return this.state.candidateSquares.reduce((acc, isSelected) => acc || isSelected)
   }
