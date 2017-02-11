@@ -62,6 +62,14 @@ export default class Square extends React.Component {
     return this.props.initialNumber !== '';
   }
 
+  handleClick() {
+    //don't allow initials square to be selected
+    if (this.isInitialSquare()) {
+      return;
+    }
+    this.props.onSquareSelection();
+  }
+
   render() {
     let inputField;
     const isInitialSquare = this.isInitialSquare();
@@ -85,8 +93,7 @@ export default class Square extends React.Component {
     const selectedStyle = this.props.isSelected ? " selected" : "";
     return (
       <div className={"square sudoku-square" + selectedStyle}
-           onClick={() => this.props.onSquareSelection() }
-           >
+           onClick={() => this.handleClick() }>
         {inputField}
       </div>
     )
