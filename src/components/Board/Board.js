@@ -12,6 +12,7 @@ export default class Board extends React.Component {
       this.state = {
         initialBoard: this.getEmptyBoard(getInitialBoard()),
         currentBoard: this.getEmptyBoard(getInitialBoard()),
+        selectedSquare: null
       };
     }
     render() {
@@ -72,18 +73,25 @@ export default class Board extends React.Component {
         const columnOffset = y === 0 ? 0 : y === 1 ? 3 : 6;
         const squares = Array(9).fill(null);
         let iter = 0;
+        if ( this.state.selectedSquare != null) {
+          console.log("selected square is (" + this.state.selectedSquare.x + "," + this.state.selectedSquare.y + ")");
+        }
         for (let row = rowOffset; row < rowOffset + 3 ; row++) {
           for (let column = columnOffset; column < columnOffset + 3; column++) {
             const key = '(' + column + ',' + row + ')';
             const hasError = this.hasError(column, row, errors);
-
+            const curSquareIsSelected = this.isSquareSelected(row, column)
+            if(curSquareIsSelected) {
+              console.log("curSquare is selected");
+            }
             squares[iter] = <Square key={key} 
                                     hasError={hasError && this.props.showErrors}
                                     initialNumber={this.state.initialBoard[row][column]}
                                     currentNumber={this.getBoardValue(column, row)} 
                                     onSquareChange={(value) => this.setBoardValue(column, row, value)}
-                                    onSquareSelection={() => console.log("hello world")}
-                                    isFillMode={this.props.isFillMode} />
+                                    onSquareSelection={() => this.handleSquareSelection(row, column)}
+                                    isFillMode={this.props.isFillMode} 
+                                    isSelected={curSquareIsSelected} />
             iter++;
           }
         }
@@ -91,6 +99,13 @@ export default class Board extends React.Component {
         return (
           <Region key={key} squares={squares} />
         )
+      }
+
+      isSquareSelected(row, column) {
+        if ( this.state.selectedSquare == null) {
+          return false;
+        }
+        return row === this.state.selectedSquare.y && column === this.state.selectedSquare.x;
       }
 
       // (row, col)
@@ -204,6 +219,12 @@ export default class Board extends React.Component {
 
       setBoardValue(x, y, value) {
         this.state.currentBoard[y][x] = value;
+      }
+
+      handleSquareSelection(row, column) {
+        this.setState({
+          selectedSquare: {x: column, y: row}
+        })
       }
 
       /** @return True iff this sudoku puzzle is solved */

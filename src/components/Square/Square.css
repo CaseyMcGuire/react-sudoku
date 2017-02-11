@@ -13,8 +13,13 @@
   font-size: 25px;
 }
 
+.square.selected {
+  border: solid yellow;
+}
+
 .candidate-squares-container {
   height: 100%;
+  padding-top: 5px;
 }
 
 /* refactor this! */

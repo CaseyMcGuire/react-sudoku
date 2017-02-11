@@ -15,11 +15,6 @@ export default class Square extends React.Component {
       candidateSquares: Array(9).fill(false) /* Store the toggle state of this square if it was ever in candidate mode */
     };
   }
-  handleClick(isSelected) {
-    this.setState({
-      isSelected: isSelected
-    })
-  }
   handleChange(event) {
     const userInput = event.target.value;
     if (this.isValidInput(userInput)) {
@@ -63,14 +58,18 @@ export default class Square extends React.Component {
     return this.state.candidateSquares.reduce((acc, isSelected) => acc || isSelected)
   }
 
+  isInitialSquare() {
+    return this.props.initialNumber !== '';
+  }
+
   render() {
     let inputField;
-    const isInitialSquare = this.props.initialNumber !== '';
+    const isInitialSquare = this.isInitialSquare();
     const isCandidateMode = !this.props.isFillMode;
     if (isInitialSquare) {
       inputField = <ImmutableSquare number={this.props.initialNumber} />
     }
-    else if (this.state.isSelected && this.props.isFillMode) {
+    else if (this.props.isSelected && this.props.isFillMode) {
       inputField = <SelectedMutableSquare number={this.state.number} 
                                           handleChange={(event) => this.handleChange(event)} />
     }
@@ -83,10 +82,11 @@ export default class Square extends React.Component {
                                              hasError={this.props.hasError} /> 
     }
 
+    const selectedStyle = this.props.isSelected ? " selected" : "";
     return (
-      <div className="square sudoku-square"
-           onClick={() => this.handleClick(true)}
-           onBlur={() => this.handleClick(false)}>
+      <div className={"square sudoku-square" + selectedStyle}
+           onClick={() => this.props.onSquareSelection() }
+           >
         {inputField}
       </div>
     )
