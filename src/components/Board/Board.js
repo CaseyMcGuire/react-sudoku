@@ -73,17 +73,11 @@ export default class Board extends React.Component {
         const columnOffset = y === 0 ? 0 : y === 1 ? 3 : 6;
         const squares = Array(9).fill(null);
         let iter = 0;
-        if ( this.state.selectedSquare != null) {
-          console.log("selected square is (" + this.state.selectedSquare.x + "," + this.state.selectedSquare.y + ")");
-        }
         for (let row = rowOffset; row < rowOffset + 3 ; row++) {
           for (let column = columnOffset; column < columnOffset + 3; column++) {
             const key = '(' + column + ',' + row + ')';
-            const hasError = this.hasError(column, row, errors);
+            const hasError = errors.hasError(column, row);
             const curSquareIsSelected = this.isSquareSelected(row, column)
-            if(curSquareIsSelected) {
-              console.log("curSquare is selected");
-            }
             squares[iter] = <Square key={key} 
                                     hasError={hasError && this.props.showErrors}
                                     initialNumber={this.state.initialBoard[row][column]}
@@ -130,13 +124,11 @@ export default class Board extends React.Component {
       }
       
       getErrors() {
-        let errors = [];
-        for (let i = 0; i < this.state.currentBoard.length; i++) {
-          for (let j = 0; j < this.state.currentBoard[i].length; j++) {
-            const currentSquareErrors = this.getRowErrors(i, j).concat(this.getColumnErrors(i, j)).concat(this.getRegionErrors(i, j));
-            if (currentSquareErrors.length > 0) {
-              errors = errors.concat(currentSquareErrors);
-            }
+        let errors = new Errors();
+        for (let y = 0; y < this.state.currentBoard.length; y++) {
+          for (let x = 0; x < this.state.currentBoard[y].length; x++) {
+            const currentSquareErrors = this.getRowErrors(x, y).concat(this.getColumnErrors(x, y)).concat(this.getRegionErrors(x, y));
+            errors.addAll(currentSquareErrors);
           }
         }
         return errors;
@@ -175,8 +167,8 @@ export default class Board extends React.Component {
           if (curY === y) {
             continue;
           }
-          const valueInRow = this.getBoardValue(x, curY);
-          if (valueInRow === currentNumber && !this.getInitialBoardValue(x, curY)) {
+          const valueInColumn = this.getBoardValue(x, curY);
+          if (valueInColumn === currentNumber && !this.getInitialBoardValue(x, curY)) {
             errors.push(new Error(x, curY));
           }
         }
@@ -191,8 +183,8 @@ export default class Board extends React.Component {
         }
         
         //get the top-left coordinate of whichever region this square is in
-        const rowOffset = x < 3 ? 0 : x < 6 ? 3 : 6;
-        const columnOffset = y < 3 ? 0 : y < 6 ? 3 : 6;
+        const rowOffset = y < 3 ? 0 : y < 6 ? 3 : 6;
+        const columnOffset = x < 3 ? 0 : x < 6 ? 3 : 6;
         for (let row = rowOffset; row < rowOffset + 3; row++) {
           for (let column = columnOffset; column < columnOffset + 3; column++) {
             if (x === column && y === row) {
@@ -205,7 +197,6 @@ export default class Board extends React.Component {
             }
           }
         }
-
         return errors;
       }
 
@@ -218,7 +209,14 @@ export default class Board extends React.Component {
       }
 
       setBoardValue(x, y, value) {
-        this.state.currentBoard[y][x] = value;
+        const boardCopy = [];
+        for (let row of this.state.currentBoard) {
+          boardCopy.push(row.slice());
+        }
+        boardCopy[y][x] = value;
+        this.setState({
+          currentBoard: boardCopy
+        });
       }
 
       handleSquareSelection(row, column) {
@@ -276,6 +274,31 @@ function getInitialBoard() {
     ["6", "5", "", "", "4", "", "", "2", ""],
     ["7", "3", "", "1", "", "", "", "", ""]
   ]
+}
+
+class Errors {
+  constructor() {
+    this.errors = [];
+  }
+
+  add(error) {
+    this.errors.push(error)
+  }
+
+  addAll(errors) {
+    for (let error of errors) {
+      this.add(error);
+    }
+  }
+
+  hasError(x, y) {
+    for (let error of this.errors) {
+      if (error.x === x && error.y === y) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
 
 class Error {
