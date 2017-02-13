@@ -40,17 +40,25 @@ export default class Square extends React.Component {
 /**
  *  Record the toggling of a candidate square
  * 
- * @param {number} The index of the candidate square that was clicked (off by one such that if 1 was toggled, the index would be 0)
+ * @param {number} The number in the candidate square
  */
   handleCandidateSquareClick(i) {
     if (this.props.isFillMode) {
       return;
     }
+    const index = i - 1;
     const candidateSquares = this.state.candidateSquares.slice();
-    candidateSquares[i] = !candidateSquares[i];
+    candidateSquares[index] = !candidateSquares[index];
     this.setState({
       candidateSquares: candidateSquares
     })
+  }
+
+  handleKeyPress(event) {
+    const pressedKey = event.key;
+    if (this.isValidInput(pressedKey)) {
+      this.handleCandidateSquareClick(parseInt(pressedKey, 10));
+    }
   }
 
 /** @return True if any of this square's candidate squares have been selected. */
@@ -93,6 +101,8 @@ export default class Square extends React.Component {
     const selectedStyle = this.props.isSelected ? " selected" : "";
     return (
       <div className={"square sudoku-square" + selectedStyle}
+           tabIndex="-1"
+           onKeyPress={(event) => this.handleKeyPress(event)}
            onClick={() => this.handleClick() }>
         {inputField}
       </div>
@@ -141,7 +151,7 @@ class CandidateSquare extends React.Component {
       let candidateSquares =  [...Array(9).keys()].map(i => <SingleCandidateSquare key={i} 
                                                                                    number={i + 1} 
                                                                                    isSelected={this.props.candidateSquares[i]} 
-                                                                                   handleClick={() => this.props.handleCandidateSquareClick(i)} />);
+                                                                                   handleClick={() => this.props.handleCandidateSquareClick(i + 1)} />);
       return (
         <div className="candidate-squares-container">
           {candidateSquares}
