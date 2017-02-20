@@ -15,6 +15,8 @@ export default class Square extends React.Component {
       candidateSquares: Array(9).fill(false) /* Store the toggle state of this square if it was ever in candidate mode */
     };
   }
+
+  
   handleChange(event) {
     const userInput = event.target.value;
     if (this.isValidInput(userInput)) {
@@ -40,7 +42,7 @@ export default class Square extends React.Component {
 /**
  *  Record the toggling of a candidate square
  * 
- * @param {number} The number in the candidate square
+ * @param {number} i The number in the candidate square
  */
   handleCandidateSquareClick(i) {
     if (this.props.isFillMode) {
@@ -66,6 +68,7 @@ export default class Square extends React.Component {
     return this.state.candidateSquares.reduce((acc, isSelected) => acc || isSelected)
   }
 
+  /** @return {boolean} True if this square was one of the filled-in squares the game started with. */
   isInitialSquare() {
     return this.props.initialNumber !== '';
   }
@@ -83,7 +86,8 @@ export default class Square extends React.Component {
     const isInitialSquare = this.isInitialSquare();
     const isCandidateMode = !this.props.isFillMode;
     if (isInitialSquare) {
-      inputField = <ImmutableSquare number={this.props.initialNumber} />
+      inputField = <ImmutableSquare number={this.props.initialNumber} 
+                                    isConflict={this.props.isConflict}/>
     }
     else if (this.props.isSelected && this.props.isFillMode) {
       inputField = <SelectedMutableSquare number={this.state.number} 
@@ -95,7 +99,8 @@ export default class Square extends React.Component {
     }
     else {
       inputField =  <UnselectedMutableSquare number={this.state.number} 
-                                             hasError={this.props.hasError} /> 
+                                             hasError={this.props.hasError} 
+                                             isConflict={this.props.isConflict}/> 
     }
 
     const selectedStyle = this.props.isSelected ? " selected" : "";
@@ -110,15 +115,37 @@ export default class Square extends React.Component {
   }
 }
 
+Square.propTypes = {
+  isConflict: React.PropTypes.bool
+}
+
+/******************************************
+ * SPECIFIC SQUARE TYPES
+ ******************************************/
+
 function ImmutableSquare(props) {
+  let errorStyle;
+  if (props.isConflict) {
+    errorStyle = " immutable-secondary-error";
+  }
+  else {
+    errorStyle = "";
+  }
   return (
-    <div className="immutable-square">
+    <div className={"immutable-square" + errorStyle}>
       <div className="number-container">
         {props.number}
       </div>
     </div>
   );
 }
+
+ImmutableSquare.propTypes = {
+  /** The number in this square */
+  number: React.PropTypes.string,
+  /** True iff this square is in conflict with any other square. */
+  isConflict: React.PropTypes.bool
+};
 
 function SelectedMutableSquare(props) {
   return (
@@ -132,7 +159,16 @@ function SelectedMutableSquare(props) {
 }
 
 function UnselectedMutableSquare(props) {
-  const errorStyle = props.hasError ? "primary-error-square" : "";
+  let errorStyle;
+  if (props.hasError) {
+    errorStyle = "primary-error-square";
+  }
+  else if (props.isConflict) {
+    errorStyle = "secondary-error-square";
+  }
+  else {
+    errorStyle = "";
+  }
   return (
     <div className={errorStyle}>
       <div className="number-container">
@@ -141,6 +177,8 @@ function UnselectedMutableSquare(props) {
     </div>
   );
 }
+
+
 
 class CandidateSquare extends React.Component {
   constructor() {

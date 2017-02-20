@@ -15,6 +15,7 @@ export default class Board extends React.Component {
         selectedSquare: null
       };
     }
+
     render() {
       const regions = this.getRegions();
       const firstRow = regions.slice(0, 3);
@@ -37,10 +38,9 @@ export default class Board extends React.Component {
 
       getRegions() {
         const regions = [];
-        const errors = this.getErrors();
         for (let row = 0; row < 3; row++) {
           for (let column = 0; column < 3; column++) {
-            regions.push(this.getRegion(row, column, errors));
+            regions.push(this.getRegion(row, column));
           }
         }
         return regions;
@@ -68,7 +68,7 @@ export default class Board extends React.Component {
        * @param {number} y The y-coordinate of the region (between 0 and 2)
        * @return {Region} The region of the board at the specified coordinate
        */
-      getRegion(x, y, errors) {
+      getRegion(x, y) {
         const rowOffset = x === 0 ? 0 : x === 1 ? 3 : 6;
         const columnOffset = y === 0 ? 0 : y === 1 ? 3 : 6;
         const squares = Array(9).fill(null);
@@ -76,13 +76,16 @@ export default class Board extends React.Component {
         for (let row = rowOffset; row < rowOffset + 3 ; row++) {
           for (let column = columnOffset; column < columnOffset + 3; column++) {
             const key = '(' + column + ',' + row + ')';
-            const hasError = errors.hasError(column, row);
-            const curSquareIsSelected = this.isSquareSelected(row, column)
+            const error = this.props.selectedError;
+            const hasError = this.props.selectedError == null ? false : error.x === column && error.y === row;
+            const curSquareIsSelected = this.isSquareSelected(row, column);
+            const isConflict = this.props.selectedError === null ? false : this.props.selectedError.hasConflict(column, row);
             squares[iter] = <Square key={key} 
-                                    hasError={hasError && this.props.showErrors}
+                                    hasError={hasError /*&& this.props.showErrors*/}
+                                    isConflict={isConflict}
                                     initialNumber={this.state.initialBoard[row][column]}
                                     currentNumber={this.getBoardValue(column, row)} 
-                                    onSquareChange={(value) => this.setBoardValue(column, row, value)}
+                                    onSquareChange={(value) => this.handleSquareChange(column, row, value)}
                                     onSquareSelection={() => this.handleSquareSelection(row, column)}
                                     isFillMode={this.props.isFillMode} 
                                     isSelected={curSquareIsSelected} />
@@ -96,7 +99,7 @@ export default class Board extends React.Component {
       }
 
       isSquareSelected(row, column) {
-        if ( this.state.selectedSquare == null) {
+        if (this.state.selectedSquare == null) {
           return false;
         }
         return row === this.state.selectedSquare.y && column === this.state.selectedSquare.x;
@@ -114,21 +117,24 @@ export default class Board extends React.Component {
         return board;
       }
 
-      hasError(x, y, errors) {
-        for (let error of errors) {
-          if (error.x === x && error.y === y) {
-            return true;
-          }
-        }
-        return false;
-      }
-      
+      /**
+       * Return all errors currently present in the board.
+       * 
+       * @return {Errors} 
+       */
       getErrors() {
         let errors = new Errors();
         for (let y = 0; y < this.state.currentBoard.length; y++) {
           for (let x = 0; x < this.state.currentBoard[y].length; x++) {
-            const currentSquareErrors = this.getRowErrors(x, y).concat(this.getColumnErrors(x, y)).concat(this.getRegionErrors(x, y));
-            errors.addAll(currentSquareErrors);
+            //errors from initial square shouldn't be 'primary' errors
+            if (this.getInitialBoardValue(x, y)) {
+              continue;
+            }
+            const currentSquareConflicts = this.getRowConflicts(x, y).concat(this.getColumnConflicts(x, y)).concat(this.getRegionConflicts(x, y));
+            if ( currentSquareConflicts.length > 0 ) {
+              const error = new Error(x, y, currentSquareConflicts);
+              errors.add(error);
+            }
           }
         }
         return errors;
@@ -136,7 +142,7 @@ export default class Board extends React.Component {
 
       //TODO: The code to check rows and columns is super similar... See if the logic
       //can be combined somehow...
-      getRowErrors(x, y) {
+      getRowConflicts(x, y) {
         const currentNumber = this.getBoardValue(x, y);
         const errors = [];
         if (!currentNumber) {
@@ -150,14 +156,14 @@ export default class Board extends React.Component {
           //right now, we will say this square constitutes an error iff: 
           //  1) it duplicates another number in this row, and
           //  2) it was *not* part of the initial board (since we only want to highlight user errors)
-          if (valueInRow === currentNumber && !this.getInitialBoardValue(curX, y)) {
-            errors.push(new Error(curX, y));
+          if (valueInRow === currentNumber) {
+            errors.push(new Conflict(curX, y, true, false, false));
           }
         }
         return errors;
       }
 
-      getColumnErrors(x, y) {
+      getColumnConflicts(x, y) {
         const currentNumber = this.getBoardValue(x, y);
         const errors = [];
         if (!currentNumber) {
@@ -168,14 +174,14 @@ export default class Board extends React.Component {
             continue;
           }
           const valueInColumn = this.getBoardValue(x, curY);
-          if (valueInColumn === currentNumber && !this.getInitialBoardValue(x, curY)) {
-            errors.push(new Error(x, curY));
+          if (valueInColumn === currentNumber) {
+            errors.push(new Conflict(x, curY, false, true, false));
           }
         }
         return errors;
       }
 
-      getRegionErrors(x, y) {
+      getRegionConflicts(x, y) {
         const currentNumber = this.getBoardValue(x, y);
         const errors = [];
         if (!currentNumber) {
@@ -192,8 +198,8 @@ export default class Board extends React.Component {
             }
             
             const value = this.getBoardValue(column, row);
-            if (value === currentNumber && !this.getInitialBoardValue(column, row)) {
-              errors.push(new Error(column, row));
+            if (value === currentNumber) {
+              errors.push(new Conflict(column, row, false, false, true));
             }
           }
         }
@@ -208,7 +214,15 @@ export default class Board extends React.Component {
         return this.state.currentBoard[y][x];
       }
 
-      setBoardValue(x, y, value) {
+      /**
+       * Sets the value of a square in the board.
+       * 
+       * @param {number} x The x-coordinate of the square to set
+       * @param {number} y The y-coordinate of the square to set
+       * @param {number} value The value to set the square to
+       * @param {function} callback An optional function to call after the state has been updated
+       */
+      setBoardValue(x, y, value, callback) {
         const boardCopy = [];
         for (let row of this.state.currentBoard) {
           boardCopy.push(row.slice());
@@ -216,6 +230,18 @@ export default class Board extends React.Component {
         boardCopy[y][x] = value;
         this.setState({
           currentBoard: boardCopy
+        }, callback);
+      }
+
+      /**
+       * @param {number} x The x-coordinate of the changed square
+       * @param {number} y The y-coordinate of the changed square
+       * @param {number} value The value that the board coordinate was changed to.
+       */
+      handleSquareChange(x, y, value) {
+        this.setBoardValue(x, y, value, () => {
+          const errors = this.getErrors();  
+          this.props.onErrors(errors.errors);
         });
       }
 
@@ -245,6 +271,9 @@ export default class Board extends React.Component {
       }
 }
 
+Square.propTypes = {
+  selectedError: React.PropTypes.instanceOf(Error)
+};
 
 
 /**
@@ -285,25 +314,60 @@ class Errors {
     this.errors.push(error)
   }
 
-  addAll(errors) {
-    for (let error of errors) {
-      this.add(error);
-    }
+  hasError(x, y) {
+    return this.getError(x, y) !== null;
   }
 
-  hasError(x, y) {
+  getError(x, y) {
     for (let error of this.errors) {
       if (error.x === x && error.y === y) {
-        return true;
+        return error;
       }
     }
-    return false;
+    return null;
   }
 }
 
 class Error {
-  constructor(x, y) {
+
+  /**
+   * @param {number} x The x-coordinate (column) of the error
+   * @param {number} y The y-coordinate (row) of the error
+   * @return {Array<Conflict>} conflicts All the squares this error has conflicts with.
+   */
+  constructor(x, y, conflicts) {
     this.x = x;
     this.y = y;
+    this.conflicts = conflicts;
+  }
+
+  /**
+   * Returns whether this error square has a conflict at the passed coordinates.
+   * 
+   * @param {number} row The row to check
+   * @param {number} column The column to check
+   * @return {boolean} True if this error has a conflict at the passed coordinates
+   */
+   hasConflict(row, column) {
+     for (let conflict of this.conflicts) {
+       if (conflict.x === row && conflict.y === column) {
+         return true;
+       }
+     }
+     return false;
+   }
+}
+
+class Conflict {
+  /**
+   * 
+   */
+  constructor(x, y, row, column, region) {
+    this.x = x;
+    this.y = y;
+    this.row = row;
+    this.column = column;
+    this.region = region;
   }
 }
+

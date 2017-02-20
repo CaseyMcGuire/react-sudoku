@@ -1,0 +1,20 @@
+.error-panel {
+	width: 150px;
+	display: inline-block;
+	border: solid 1px #000000;
+	vertical-align: top;
+	margin: 2px;
+}
+
+.error-list {
+	display: inline-block; /* Have to add this to stop list from overlapping board */
+	list-style-type: none;
+}
+
+.error-list > li {
+	cursor: pointer;
+}
+
+.error-title {
+	font-size: 25px;
+}
