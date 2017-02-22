@@ -8,7 +8,6 @@ export default class GameContainer extends React.Component {
   constructor() {
     super();
     this.state = {
-      showErrors: false,
       isFillMode: true,
       errors: [],
       selectedError: null  //{Error}
@@ -50,8 +49,7 @@ export default class GameContainer extends React.Component {
       </div>
       <div className="play-container">
         <div className="board-and-error-container">
-          <Board showErrors={this.state.showErrors}
-                 selectedError={this.state.selectedError} 
+          <Board selectedError={this.state.selectedError} 
                  isFillMode={this.state.isFillMode} 
                  onErrors={(errors) => this.setErrors(errors)}  />
           <ErrorPanel errors={this.state.errors} onErrorSelection={(error) => this.setSelectedError(error)}/>

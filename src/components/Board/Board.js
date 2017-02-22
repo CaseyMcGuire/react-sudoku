@@ -77,11 +77,12 @@ export default class Board extends React.Component {
           for (let column = columnOffset; column < columnOffset + 3; column++) {
             const key = '(' + column + ',' + row + ')';
             const error = this.props.selectedError;
-            const hasError = this.props.selectedError == null ? false : error.x === column && error.y === row;
+            const isError = this.props.selectedError == null ? false : error.x === column && error.y === row;
+
             const curSquareIsSelected = this.isSquareSelected(row, column);
             const isConflict = this.props.selectedError === null ? false : this.props.selectedError.hasConflict(column, row);
             squares[iter] = <Square key={key} 
-                                    hasError={hasError /*&& this.props.showErrors*/}
+                                    isError={isError}
                                     isConflict={isConflict}
                                     initialNumber={this.state.initialBoard[row][column]}
                                     currentNumber={this.getBoardValue(column, row)} 
@@ -131,7 +132,7 @@ export default class Board extends React.Component {
               continue;
             }
             const currentSquareConflicts = this.getRowConflicts(x, y).concat(this.getColumnConflicts(x, y)).concat(this.getRegionConflicts(x, y));
-            if ( currentSquareConflicts.length > 0 ) {
+            if (currentSquareConflicts.length > 0) {
               const error = new Error(x, y, currentSquareConflicts);
               errors.add(error);
             }
@@ -271,11 +272,6 @@ export default class Board extends React.Component {
       }
 }
 
-Square.propTypes = {
-  selectedError: React.PropTypes.instanceOf(Error)
-};
-
-
 /**
   * A single 3x3 region in a Sudoku board.
   */
@@ -328,7 +324,7 @@ class Errors {
   }
 }
 
-class Error {
+export class Error {
 
   /**
    * @param {number} x The x-coordinate (column) of the error
@@ -371,3 +367,9 @@ class Conflict {
   }
 }
 
+Board.propTypes = {
+  /** True if the game is currenty in fill mode */
+  isFillMode: React.PropTypes.bool,
+  /** The error that the user clicked on */
+  selectedError: React.PropTypes.instanceOf(Error)
+};

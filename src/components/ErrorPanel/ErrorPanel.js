@@ -1,5 +1,6 @@
 import React from 'react';
 import './ErrorPanel.css';
+import {Error} from '../Board/Board.js';
 
 /**
  * Panel that displays current outstanding errors to the user. 
@@ -26,9 +27,8 @@ export default class ErrorPanel extends React.Component {
 }
 
 ErrorPanel.propTypes = {
-
 	/** An array of {Error} objects that represent each error present in the board */
-	errors: React.PropTypes.array,
+	errors: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Error)),
 	/** Callback that takes the error the user clicked on. */
 	onErrorSelection: React.PropTypes.func
 };

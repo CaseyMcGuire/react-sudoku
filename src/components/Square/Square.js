@@ -99,7 +99,7 @@ export default class Square extends React.Component {
     }
     else {
       inputField =  <UnselectedMutableSquare number={this.state.number} 
-                                             hasError={this.props.hasError} 
+                                             isError={this.props.isError} 
                                              isConflict={this.props.isConflict}/> 
     }
 
@@ -116,8 +116,23 @@ export default class Square extends React.Component {
 }
 
 Square.propTypes = {
-  isConflict: React.PropTypes.bool
-}
+  /** True if this square is the 'primary' error square */
+  isError: React.PropTypes.bool,
+  /** True if this square is in conflict with the 'primary' error square */
+  isConflict: React.PropTypes.bool,
+  /** The value that was in this square at the beginning of the game. Null if this square was empty.*/
+  initialNumber: React.PropTypes.string,
+  /** The value currently in this square. Null if there isn't a value in this square. */
+  currentNumber: React.PropTypes.string,
+  /** Callback for when the value inside a square has been changed (can only happen in Fill Mode) */
+  onSquareChange: React.PropTypes.func,
+  /** Callback for when a square is selected */
+  onSquareSelection: React.PropTypes.func,
+  /** True if the current board mode is Fill Mode */
+  isFillMode: React.PropTypes.bool,
+  /** True if this square is the currently selected square (i.e. the last square the user clicked on) */
+  isSelected: React.PropTypes.bool
+};
 
 /******************************************
  * SPECIFIC SQUARE TYPES
@@ -143,7 +158,7 @@ function ImmutableSquare(props) {
 ImmutableSquare.propTypes = {
   /** The number in this square */
   number: React.PropTypes.string,
-  /** True iff this square is in conflict with any other square. */
+  /** True iff this square is in conflict with the error square. */
   isConflict: React.PropTypes.bool
 };
 
@@ -158,9 +173,16 @@ function SelectedMutableSquare(props) {
   );
 }
 
+SelectedMutableSquare.propTypes = {
+  /** The number in this square. */
+  number: React.PropTypes.string,
+  /** Callback when user changes number in square */
+  handleChange: React.PropTypes.func
+};
+
 function UnselectedMutableSquare(props) {
   let errorStyle;
-  if (props.hasError) {
+  if (props.isError) {
     errorStyle = "primary-error-square";
   }
   else if (props.isConflict) {
@@ -178,6 +200,14 @@ function UnselectedMutableSquare(props) {
   );
 }
 
+UnselectedMutableSquare.propTypes = {
+  /** True if this square is the selected error */
+  isError: React.PropTypes.bool,
+  /** True if this square is conflicting with the selected error */
+  isConflict: React.PropTypes.bool,
+  /** The number in this square */
+  number: React.PropTypes.number
+};
 
 
 class CandidateSquare extends React.Component {
@@ -198,6 +228,13 @@ class CandidateSquare extends React.Component {
     }
 }
 
+CandidateSquare.propTypes = {
+  /** An array describing which of the candidate squares has been toggled */
+  candidateSquares: React.PropTypes.arrayOf(React.PropTypes.bool),
+  /** Callback when a single candidate square is clicked. */
+  handleCandidateSquareClick: React.PropTypes.func
+};
+
 class SingleCandidateSquare extends React.Component {
   constructor() {
     super();
@@ -212,5 +249,13 @@ class SingleCandidateSquare extends React.Component {
       </div>
     );
   }
-
 }
+
+SingleCandidateSquare.propTypes = {
+  /** This candidate square's number */
+  number: React.PropTypes.number,
+  /** True if this square has been toggled (i.e. whether it should be displayed) */
+  isSelected: React.PropTypes.bool,
+  /** Callback for when this square is clicked */
+  handleClick: React.PropTypes.func
+};
