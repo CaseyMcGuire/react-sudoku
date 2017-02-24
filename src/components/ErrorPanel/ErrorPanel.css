@@ -1,14 +1,16 @@
 .error-panel {
-	width: 150px;
-	display: inline-block;
 	border: solid 1px #000000;
+	display: inline-block;
+	height: 50%;
 	vertical-align: top;
 	margin: 2px;
+	width: 190px;
 }
 
 .error-list {
 	display: inline-block; /* Have to add this to stop list from overlapping board */
 	list-style-type: none;
+	width: 100%;
 }
 
 .error-list > li {
@@ -17,4 +19,26 @@
 
 .error-title {
 	font-size: 25px;
+}
+
+.error-list-container {
+	height: 74%;
+}
+
+.clear-error-button {
+	background-color: #B4B4B4;
+    border: none;
+    padding: 8px 50px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+	color: #000000;
+	border-radius: 6px;
+}
+
+.clear-error-button:hover {
+	background-color: #CECECE;
 }

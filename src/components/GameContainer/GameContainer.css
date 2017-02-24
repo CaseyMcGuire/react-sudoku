@@ -3,6 +3,12 @@
   font-size: 50px;
 }
 
+.play-container {
+  width: 800px;
+  margin: 0 auto;
+}
+
 .board-and-error-container {
   text-align: center;
+  height: 600px;
 }

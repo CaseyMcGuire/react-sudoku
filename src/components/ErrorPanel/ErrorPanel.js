@@ -18,9 +18,12 @@ export default class ErrorPanel extends React.Component {
 				<div className="error-panel-header">
 					<span className="error-title">Errors</span>
 				</div>
-				<ul className="error-list">
-					{errorDisplay}
-				</ul>
+				<div className="error-list-container">
+					<ul className="error-list">
+						{errorDisplay}
+					</ul>
+				</div>
+				<button className="clear-error-button" onClick={() => this.props.onErrorSelection(null)}>Clear</button>
 			</div>
 		);
 	}
