@@ -91,6 +91,8 @@ export default class Square extends React.Component {
     }
     else if (this.props.isSelected && this.props.isFillMode) {
       inputField = <SelectedMutableSquare number={this.state.number} 
+                                          isError={this.props.isError}
+                                          isConflict={this.props.isConflict}
                                           handleChange={(event) => this.handleChange(event)} />
     }
     else if (!this.state.number && (this.hasAnyCandidateSquares() || isCandidateMode)) {
@@ -163,13 +165,25 @@ ImmutableSquare.propTypes = {
 };
 
 function SelectedMutableSquare(props) {
+  let errorStyle;
+  if (props.isError) {
+    errorStyle = " error";
+  }
+  else if (props.isConflict) {
+    errorStyle = " conflict";
+  }
+  else {
+    errorStyle = "";
+  }
   return (
-    <input className="input-field"
-           value={props.number}
-           type="text"
-           onChange={(event) => props.handleChange(event)}
-           maxLength="1"
-           autoFocus/>
+    <div className={"input-field-container" + errorStyle}>
+      <input className="input-field"
+             value={props.number}
+             type="text"
+             onChange={(event) => props.handleChange(event)}
+             maxLength="1"
+             autoFocus/>
+    </div>
   );
 }
 
@@ -177,7 +191,11 @@ SelectedMutableSquare.propTypes = {
   /** The number in this square. */
   number: React.PropTypes.string,
   /** Callback when user changes number in square */
-  handleChange: React.PropTypes.func
+  handleChange: React.PropTypes.func,
+  /** True if this square is conficting with the selected error square */
+  isError: React.PropTypes.bool,
+  /** True iff this square is in conflict with the error square. */
+  isConflict: React.PropTypes.bool
 };
 
 function UnselectedMutableSquare(props) {
@@ -206,7 +224,7 @@ UnselectedMutableSquare.propTypes = {
   /** True if this square is conflicting with the selected error */
   isConflict: React.PropTypes.bool,
   /** The number in this square */
-  number: React.PropTypes.number
+  number: React.PropTypes.string
 };
 
 

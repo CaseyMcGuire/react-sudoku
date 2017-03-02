@@ -28,6 +28,10 @@
   font-size: 15px;
 }
 
+.input-field-container {
+  height: 100%;
+}
+
 .input-field {
   width: 100%;
   height: 100%;
@@ -36,6 +40,19 @@
   font-size: inherit;
   box-shadow: none;
   border: none;
+}
+
+.input-field-container.error > .input-field,
+.input-field-container.conflict > .input-field {
+  color: #FFFFFF;
+}
+
+.input-field-container.error > .input-field {
+  background-color: #BF120D;
+}
+
+.input-field-container.conflict > .input-field {
+  background-color: #BF7A76;
 }
 
 .input-field:focus {
