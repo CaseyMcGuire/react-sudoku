@@ -12,7 +12,8 @@ export default class Board extends React.Component {
       this.state = {
         initialBoard: this.getEmptyBoard(getInitialBoard()),
         currentBoard: this.getEmptyBoard(getInitialBoard()),
-        selectedSquare: null
+        selectedSquare: null,
+        candidateSquaresBoard: this.getEmptyCandidateBoard()
       };
     }
 
@@ -34,6 +35,32 @@ export default class Board extends React.Component {
           </div>
         </div>
       );
+    }
+
+    componentWillReceiveProps(nextProps) {
+      
+      //If we haven't selected a square yet, don't try to update the board
+      if (this.state.selectedSquare == null) {
+        return;
+      }
+
+      //We'll need an enum here...
+      //essentially what we want is to know if the pressed: 
+      // -nothing
+      // -clear
+      // -or, a number
+      //Right now, we'll say null means 'nothing'
+      if (nextProps.lastSelectedNumber === null) {
+        return;
+      }
+
+      //Handle number input from the number input panel here by updating the state of the board.
+      if (this.props.isFillMode) {
+        this.setBoardValue(this.state.selectedSquare.x, this.state.selectedSquare.y, nextProps.lastSelectedNumber + '');
+      }
+      else {
+        this.toggleCandidateForSquare(this.state.selectedSquare.x, this.state.selectedSquare.y, nextProps.lastSelectedNumber);
+      }
     }
 
       getRegions() {
@@ -81,11 +108,12 @@ export default class Board extends React.Component {
 
             const curSquareIsSelected = this.isSquareSelected(row, column);
             const isConflict = this.props.selectedError === null ? false : this.props.selectedError.hasConflict(column, row);
-            squares[iter] = <Square key={key} 
+            squares[iter] = <Square key={key}
                                     isError={isError}
                                     isConflict={isConflict}
-                                    initialNumber={this.state.initialBoard[row][column]}
-                                    currentNumber={this.getBoardValue(column, row)} 
+                                    initialNumber={this.getInitialBoardValue(column, row)}
+                                    currentNumber={this.getBoardValue(column, row)}
+                                    candidateSquares={this.getCandidateForSquare(column, row)}
                                     onSquareChange={(value) => this.handleSquareChange(column, row, value)}
                                     onSquareSelection={() => this.handleSquareSelection(row, column)}
                                     isFillMode={this.props.isFillMode} 
@@ -116,6 +144,51 @@ export default class Board extends React.Component {
           }
         }
         return board;
+      }
+
+      /** @returns {Array<Array<boolean>>} Returns an empty  */
+       getEmptyCandidateBoard() {
+        const candidateBoard = Array(9).fill(null);
+        for (let i = 0; i < candidateBoard.length; i++) {
+          candidateBoard[i] = Array(9).fill(null);
+          for (let j = 0; j < candidateBoard[i].length; j++) {
+            candidateBoard[i][j] = Array(9).fill(false);
+          }
+        }
+        return candidateBoard;
+      }
+
+     /**
+      * Get the the 9-element array describing the toggle state of each candidate square for
+      * this particular square.
+      *
+      * @param x The x-coordinate of the square
+      * @param y The y-coordinate of the square
+      * @returns {Array<Boolean>} The 9-element array representing the toggle state of the given candidate square
+      */
+      getCandidateForSquare(x, y) {
+        return this.state.candidateSquaresBoard[y][x];
+      }
+
+      toggleCandidateForSquare(x, y, value) {
+        const newCandidateBoard = Array(9).fill(null);
+        const oldCandidateBoard = this.state.candidateSquaresBoard;
+        for (let row = 0; row < newCandidateBoard.length; row++) {
+          newCandidateBoard[row] = Array(9).fill(null);
+          for (let column = 0; column < newCandidateBoard[row].length; column++) {
+            newCandidateBoard[row][column] = oldCandidateBoard[row][column];
+            //toggle the value that's supposed to change
+            if (x === column && y === row) {
+              //because the candidate squares have an index origin of 1 and arrays have an index origin of 0, we need
+              //to subtract 1 here.
+              newCandidateBoard[row][column][value - 1] = !newCandidateBoard[row][column][value - 1];
+            }
+          }
+        }
+
+        this.setState({
+          candidateSquaresBoard: newCandidateBoard
+        });
       }
 
       /**
@@ -240,16 +313,27 @@ export default class Board extends React.Component {
        * @param {number} value The value that the board coordinate was changed to.
        */
       handleSquareChange(x, y, value) {
-        this.setBoardValue(x, y, value, () => {
-          const errors = this.getErrors();  
-          this.props.onErrors(errors.errors);
-        });
+        if (this.props.isFillMode) {
+          this.setBoardValue(x, y, value, () => {
+            const errors = this.getErrors();
+            this.props.onErrors(errors.errors);
+          });
+        }
+        else {
+          this.toggleCandidateForSquare(x, y, value);
+        }
+        this.props.handleSquareSelection();
       }
 
       handleSquareSelection(row, column) {
+        //don't do anything if this is the same square that's already selected
+        if (this.state.selectedSquare !== null && (row === this.state.selectedSquare.x && column === this.state.selectedSquare.y) ) {
+          return;
+        }
         this.setState({
           selectedSquare: {x: column, y: row}
-        })
+        });
+        this.props.handleSquareSelection();
       }
 
       /** @return True iff this sudoku puzzle is solved */
@@ -367,9 +451,12 @@ class Conflict {
   }
 }
 
+//Have to put this down here since the Error class apparently isn't in scope yet.
 Board.propTypes = {
   /** True if the game is currenty in fill mode */
   isFillMode: React.PropTypes.bool,
   /** The error that the user clicked on */
-  selectedError: React.PropTypes.instanceOf(Error)
+  selectedError: React.PropTypes.instanceOf(Error),
+  onErrors: React.PropTypes.func,
+  lastSelectedNumber: React.PropTypes.number
 };

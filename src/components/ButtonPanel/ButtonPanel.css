@@ -35,32 +35,3 @@
 .check-button:hover {
   background-color: #3894FF;
 }
-
-.square-mode-container {
-  width: 23%;
-  border-left: 1px solid #000000;
-}
-
-.single-mode-button-container {
-  width: 50%;
-  display: inline-block;
-}
-
-.mode-button {
-  margin: 0 auto;
-  cursor: pointer;
-  margin-top: 3px;
-  color: #4B7DBF;
-  text-align: center;
-  width: 43px;
-}
-
-.mode-button.selected {
-  color: #FFFFFF;
-  background-color: #4B7DBF;
-  border-radius: 10px;
-}
-
-.fill-mode-button {
-  font-size: 35px;
-}

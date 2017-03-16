@@ -9,20 +9,16 @@ export default class Square extends React.Component {
   constructor() {
     super();
     this.state = {
-      isSelected: false, /* Whether this is the square the user is currently changing */
-      number: '',         /* The number in this square. */
-      isCandidateSquare: false, /* Whether this square is currently in candidate square mode or not. */
       candidateSquares: Array(9).fill(false) /* Store the toggle state of this square if it was ever in candidate mode */
     };
   }
 
-  
-  handleChange(event) {
+ /**
+  * @param event {SyntheticEvent} The event that is fired when the Fill-mode input field is changed.
+  */
+  handleInputFieldChange(event) {
     const userInput = event.target.value;
     if (this.isValidInput(userInput)) {
-      this.setState({
-        number: userInput
-      })
       this.props.onSquareChange(userInput);
     }
   }
@@ -45,27 +41,19 @@ export default class Square extends React.Component {
  * @param {number} i The number in the candidate square
  */
   handleCandidateSquareClick(i) {
-    if (this.props.isFillMode) {
-      return;
-    }
-    const index = i - 1;
-    const candidateSquares = this.state.candidateSquares.slice();
-    candidateSquares[index] = !candidateSquares[index];
-    this.setState({
-      candidateSquares: candidateSquares
-    })
+    this.props.onSquareChange(i);
   }
 
   handleKeyPress(event) {
     const pressedKey = event.key;
     if (this.isValidInput(pressedKey)) {
-      this.handleCandidateSquareClick(parseInt(pressedKey, 10));
+      this.props.onSquareChange(pressedKey);
     }
   }
 
 /** @return True if any of this square's candidate squares have been selected. */
   hasAnyCandidateSquares() {
-    return this.state.candidateSquares.reduce((acc, isSelected) => acc || isSelected)
+    return this.props.candidateSquares.reduce((acc, isSelected) => acc || isSelected)
   }
 
   /** @return {boolean} True if this square was one of the filled-in squares the game started with. */
@@ -90,17 +78,17 @@ export default class Square extends React.Component {
                                     isConflict={this.props.isConflict}/>
     }
     else if (this.props.isSelected && this.props.isFillMode) {
-      inputField = <SelectedMutableSquare number={this.state.number} 
+      inputField = <SelectedMutableSquare number={this.props.currentNumber} 
                                           isError={this.props.isError}
                                           isConflict={this.props.isConflict}
-                                          handleChange={(event) => this.handleChange(event)} />
+                                          handleInputFieldChange={(event) => this.handleInputFieldChange(event)} />
     }
-    else if (!this.state.number && (this.hasAnyCandidateSquares() || isCandidateMode)) {
-      inputField = <CandidateSquare candidateSquares={this.state.candidateSquares}
+    else if (!this.props.currentNumber && (this.hasAnyCandidateSquares() || isCandidateMode)) {
+      inputField = <CandidateSquare candidateSquares={this.props.candidateSquares}
                                     handleCandidateSquareClick={(i) => this.handleCandidateSquareClick(i)} />
     }
     else {
-      inputField =  <UnselectedMutableSquare number={this.state.number} 
+      inputField =  <UnselectedMutableSquare number={this.props.currentNumber} 
                                              isError={this.props.isError} 
                                              isConflict={this.props.isConflict}/> 
     }
@@ -126,14 +114,16 @@ Square.propTypes = {
   initialNumber: React.PropTypes.string,
   /** The value currently in this square. Null if there isn't a value in this square. */
   currentNumber: React.PropTypes.string,
-  /** Callback for when the value inside a square has been changed (can only happen in Fill Mode) */
+  /** Callback for when the value inside a square has been changed */
   onSquareChange: React.PropTypes.func,
   /** Callback for when a square is selected */
   onSquareSelection: React.PropTypes.func,
   /** True if the current board mode is Fill Mode */
   isFillMode: React.PropTypes.bool,
   /** True if this square is the currently selected square (i.e. the last square the user clicked on) */
-  isSelected: React.PropTypes.bool
+  isSelected: React.PropTypes.bool,
+  /** The toggle state of the 9 possible candidates */
+  candidateSquares: React.PropTypes.arrayOf(React.PropTypes.bool)
 };
 
 /******************************************
@@ -180,7 +170,7 @@ function SelectedMutableSquare(props) {
       <input className="input-field"
              value={props.number}
              type="text"
-             onChange={(event) => props.handleChange(event)}
+             onChange={(event) => props.handleInputFieldChange(event)}
              maxLength="1"
              autoFocus/>
     </div>

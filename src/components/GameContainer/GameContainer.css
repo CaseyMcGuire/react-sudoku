@@ -4,11 +4,18 @@
 }
 
 .play-container {
-  width: 800px;
+  width: 805px;
   margin: 0 auto;
 }
 
 .board-and-error-container {
   text-align: center;
   height: 600px;
+}
+
+.error-panel-and-number-input-panel {
+  display: inline-block;
+  width: 200px;
+  height: 100%;
+  margin-left: 5px;
 }
