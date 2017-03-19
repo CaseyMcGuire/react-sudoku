@@ -1,17 +1,17 @@
 .number-input-panel-container {
 	display: inline-block;
-	height: 200px;
+	height: 250px;
 	margin-top: 10px;
+	border-top: solid 1px #CCCCCC;
+	padding-top: 10px;
 }
 
 .number-input-panel {
 	height: 100%;
 }
 
-.number-input-button {
-	background-color: #337ab7;
+.number-input-panel-button {
 	border-radius: 5px;
-	color: #FFFFFF;
 	cursor: pointer;
 	float: left;
 	font-size: 30px;
@@ -21,13 +21,36 @@
 	width: 33%;
 }
 
+.number-input-button {
+	background-color: #337ab7;
+	color: #FFFFFF;
+}
+
 .number-input-button:hover {
 	background: #1A619E;
+}
+
+.clear-button {
+	background-color: #B4B4B4;
+	border: none;
+	color: #353535;
+	float: right;
+	margin-right: 2px;
+}
+
+.clear-button:hover {
+	background-color: #CECECE;
 }
 
 /***************
 * MODE BUTTONS
 ****************/
+
+.square-mode-container {
+	border-top: solid 1px #CCCCCC;
+	padding-top: 10px;
+	margin-top: 5px;
+}
 
 .single-mode-button-container {
   width: 50%;

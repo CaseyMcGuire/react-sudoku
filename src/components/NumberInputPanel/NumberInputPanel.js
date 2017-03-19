@@ -1,34 +1,34 @@
 import React from 'react';
 import './NumberInputPanel.css';
 
-export default class NumberInputPanel extends React.Component {
-
-	constructor() {
-		super();
-	}
-
-	render() {
+export default function NumberInputPanel(props)  {
 		return (
 			<div className="number-input-panel-container">
 				<div className="number-input-panel">
-					{[...Array(9).keys()].map(i => <NumberButton key={i} number={i + 1} handleNumberButtonPressed={this.props.handleNumberButtonPressed}/>)}
+					{[...Array(9).keys()].map(i => <NumberButton key={i} number={i + 1} handleNumberButtonPressed={props.handleNumberButtonPressed}/>)}
+					<ClearButton handleClearButtonPressed={props.handleNumberButtonPressed}/>
 				</div>
 				<div className="square-mode-container">
           			<div className="single-mode-button-container"> 
-            			<FillButton onClick={() => this.props.handleModeChange(true)} isFillMode={this.props.isFillMode} />
+            			<FillButton onClick={() => props.handleModeChange(true)} isFillMode={props.isFillMode} />
           			</div>
           			<div className="single-mode-button-container">
-             			<CandidateButton onClick={() => this.props.handleModeChange(false)} isFillMode={this.props.isFillMode}/>
+             			<CandidateButton onClick={() => props.handleModeChange(false)} isFillMode={props.isFillMode}/>
           			</div>
         		</div>
 			</div>
 		);
-	}
+}
+
+function ClearButton(props) {
+	return (
+		<div className="number-input-panel-button clear-button" onClick={() => props.handleClearButtonPressed(ValidInputEnum.CLEAR)}>C</div>
+	);
 }
 
 function NumberButton(props) {
 	return (
-		<div className="number-input-button" onClick={() => props.handleNumberButtonPressed(props.number)}>{props.number}</div>
+		<div className="number-input-panel-button number-input-button" onClick={() => props.handleNumberButtonPressed(props.number)}>{props.number}</div>
 	);
 }
 
@@ -49,3 +49,17 @@ function CandidateButton(props) {
     </div>
   );
 }
+
+export const ValidInputEnum = {
+	CLEAR: -1,
+	NOTHING: 0,
+	ONE: 1,
+	TWO: 2,
+	THREE: 3,
+	FOUR: 4,
+	FIVE: 5,
+	SIX: 6,
+	SEVEN: 7,
+	EIGHT: 8,
+	NINE: 9
+};

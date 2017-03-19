@@ -1,7 +1,7 @@
 import React from 'react';
 import Square from '../Square/Square.js';
 import './Board.css';
-
+import {ValidInputEnum} from '../NumberInputPanel/NumberInputPanel';
 
 /**
  * The actual 9x9 sudoku game board
@@ -38,30 +38,55 @@ export default class Board extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-      
-      //If we haven't selected a square yet, don't try to update the board
-      if (this.state.selectedSquare == null) {
-        return;
-      }
-
-      //We'll need an enum here...
-      //essentially what we want is to know if the pressed: 
-      // -nothing
-      // -clear
-      // -or, a number
-      //Right now, we'll say null means 'nothing'
-      if (nextProps.lastSelectedNumber === null) {
-        return;
-      }
-
-      //Handle number input from the number input panel here by updating the state of the board.
-      if (this.props.isFillMode) {
-        this.setBoardValue(this.state.selectedSquare.x, this.state.selectedSquare.y, nextProps.lastSelectedNumber + '');
-      }
-      else {
-        this.toggleCandidateForSquare(this.state.selectedSquare.x, this.state.selectedSquare.y, nextProps.lastSelectedNumber);
-      }
+      this.handleNumberPanelInput(nextProps.lastSelectedNumber);
     }
+
+  /**
+   * Handle an input from the number input panel.
+   *
+   * @param {ValidInputEnum} numberPanelInput The input from the number input panel.
+   */
+  handleNumberPanelInput(numberPanelInput) {
+      //If we haven't selected a square yet, don't try to update the board
+    if (this.state.selectedSquare == null) {
+      return;
+    }
+
+    const selectedX = this.state.selectedSquare.x;
+    const selectedY = this.state.selectedSquare.y;
+
+    switch(numberPanelInput) {
+      case ValidInputEnum.NOTHING:
+        return;
+      case ValidInputEnum.CLEAR:
+        if (this.props.isFillMode) {
+          this.setBoardValue(selectedX, selectedY, '');
+        }
+        else {
+          this.clearCandidatesForSquare(selectedX, selectedY);
+        }
+        break;
+      case ValidInputEnum.ONE:
+      case ValidInputEnum.TWO:
+      case ValidInputEnum.THREE:
+      case ValidInputEnum.FOUR:
+      case ValidInputEnum.FIVE:
+      case ValidInputEnum.SIX:
+      case ValidInputEnum.SEVEN:
+      case ValidInputEnum.EIGHT:
+      case ValidInputEnum.NINE:
+        //Handle number input from the number input panel here by updating the state of the board.
+        if (this.props.isFillMode) {
+          this.setBoardValue(selectedX, selectedY, numberPanelInput + '');
+        }
+        else {
+          this.toggleCandidateForSquare(selectedX, selectedY, numberPanelInput);
+        }
+        break;
+      default:
+        console.log('non-exhaustive pattern: ' + numberPanelInput);
+    }
+  }
 
       getRegions() {
         const regions = [];
@@ -171,17 +196,31 @@ export default class Board extends React.Component {
       }
 
       toggleCandidateForSquare(x, y, value) {
+        const values = this.state.candidateSquaresBoard[y][x].slice();
+        //because the candidate squares have an index origin of 1 and arrays have an index origin of 0, we need
+        //to subtract 1 here.
+        values[value - 1] = !values[value - 1];
+        this.setCandidatesForSquare(x, y, values);
+      }
+
+   /**
+    * Set the state of the candidate squares for the given sudoku square.
+    *
+    * @param {number} x The x-coordinate of the sudoku square
+    * @param {number} y The y-coordinate of the sudoku square
+    * @param {Array<number>} values A 9-element array of the toggle state of each candidate square.
+    */
+    setCandidatesForSquare(x, y, values) {
         const newCandidateBoard = Array(9).fill(null);
         const oldCandidateBoard = this.state.candidateSquaresBoard;
         for (let row = 0; row < newCandidateBoard.length; row++) {
           newCandidateBoard[row] = Array(9).fill(null);
           for (let column = 0; column < newCandidateBoard[row].length; column++) {
-            newCandidateBoard[row][column] = oldCandidateBoard[row][column];
-            //toggle the value that's supposed to change
             if (x === column && y === row) {
-              //because the candidate squares have an index origin of 1 and arrays have an index origin of 0, we need
-              //to subtract 1 here.
-              newCandidateBoard[row][column][value - 1] = !newCandidateBoard[row][column][value - 1];
+              newCandidateBoard[row][column] = values;
+            }
+            else {
+              newCandidateBoard[row][column] = oldCandidateBoard[row][column];
             }
           }
         }
@@ -190,6 +229,16 @@ export default class Board extends React.Component {
           candidateSquaresBoard: newCandidateBoard
         });
       }
+
+  /**
+   * Clears all displayed candidate squares from the passed square.
+   *
+   * @param {number} x The x-coordinate of the square to clear
+   * @param {number} y The y-coordinate of the square to clear
+   */
+  clearCandidatesForSquare(x, y) {
+    this.setCandidatesForSquare(x, y, Array(9).fill(false));
+  }
 
       /**
        * Return all errors currently present in the board.

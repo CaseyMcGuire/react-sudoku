@@ -4,6 +4,7 @@ import ButtonPanel from '../ButtonPanel/ButtonPanel';
 import ErrorPanel from '../ErrorPanel/ErrorPanel';
 import NumberInputPanel from '../NumberInputPanel/NumberInputPanel';
 import './GameContainer.css';
+import {ValidInputEnum} from '../NumberInputPanel/NumberInputPanel';
 
 export default class GameContainer extends React.Component {
   constructor() {
@@ -12,14 +13,8 @@ export default class GameContainer extends React.Component {
       isFillMode: true,
       errors: [],
       selectedError: null,  //{Error}
-      lastSelectedNumber: null //The last selected number from input
+      lastSelectedNumber: ValidInputEnum.NOTHING //The last selected number from input panel
     }
-  }
-
-  shouldShowErrors(value) {
-      this.setState({
-        showErrors: value
-      });
   }
 
   setMode(isFillMode) {
@@ -52,7 +47,7 @@ export default class GameContainer extends React.Component {
   handleSquareSquareSelection() {
     //after a new square is selected, set the last selected number to null
     //so we don't end up passing a stale number down to the new square
-    this.setLastSelectedNumber(null);
+    this.setLastSelectedNumber(ValidInputEnum.NOTHING);
   }
   
 
