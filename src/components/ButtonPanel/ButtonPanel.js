@@ -13,16 +13,17 @@ export default class ButtonPanel extends React.Component {
     return (
       <div className="button-panel">
         <div className="button-container check-button-container">
-          <button className="check-button" title="Check your current solution for errors" onClick={this.props.showErrors}>
+          <button className="check-button" title="Check your current solution for errors"
+                  onClick={this.props.showErrors}>
             Check
           </button>
         </div>
         <div className="button-container square-mode-container">
-          <div className="single-mode-button-container"> 
-            <FillButton onClick={() => this.props.handleModeChange(true)} isFillMode={this.props.isFillMode} />
+          <div className="single-mode-button-container">
+            <FillButton onClick={() => this.props.handleModeChange(true)} isFillMode={this.props.isFillMode}/>
           </div>
           <div className="single-mode-button-container">
-             <CandidateButton onClick={() => this.props.handleModeChange(false)} isFillMode={this.props.isFillMode}/>
+            <CandidateButton onClick={() => this.props.handleModeChange(false)} isFillMode={this.props.isFillMode}/>
           </div>
         </div>
         <div className="button-container">

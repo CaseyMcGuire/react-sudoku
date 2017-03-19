@@ -13,9 +13,9 @@ export default class Square extends React.Component {
     };
   }
 
- /**
-  * @param event {SyntheticEvent} The event that is fired when the Fill-mode input field is changed.
-  */
+  /**
+   * @param event {SyntheticEvent} The event that is fired when the Fill-mode input field is changed.
+   */
   handleInputFieldChange(event) {
     const userInput = event.target.value;
     if (this.isValidInput(userInput)) {
@@ -24,22 +24,22 @@ export default class Square extends React.Component {
   }
 
   /** @return True if the passed input string is a valid input for a Sudoku square
-              e.g. is an empty string or a 1 digit non-zero number */
+   e.g. is an empty string or a 1 digit non-zero number */
   isValidInput(input) {
     return input === '' ||
-    input && input.length === 1 && this.isNumeric(input) && input !== '0';
+      input && input.length === 1 && this.isNumeric(input) && input !== '0';
   }
 
- /** @return True if the passed string is a number. */
+  /** @return True if the passed string is a number. */
   isNumeric(str) {
     return !isNaN(parseFloat(str)) && isFinite(str);
   }
 
-/**
- *  Record the toggling of a candidate square
- * 
- * @param {number} i The number in the candidate square
- */
+  /**
+   *  Record the toggling of a candidate square
+   *
+   * @param {number} i The number in the candidate square
+   */
   handleCandidateSquareClick(i) {
     this.props.onSquareChange(i);
   }
@@ -51,7 +51,7 @@ export default class Square extends React.Component {
     }
   }
 
-/** @return True if any of this square's candidate squares have been selected. */
+  /** @return True if any of this square's candidate squares have been selected. */
   hasAnyCandidateSquares() {
     return this.props.candidateSquares.reduce((acc, isSelected) => acc || isSelected)
   }
@@ -74,23 +74,23 @@ export default class Square extends React.Component {
     const isInitialSquare = this.isInitialSquare();
     const isCandidateMode = !this.props.isFillMode;
     if (isInitialSquare) {
-      inputField = <ImmutableSquare number={this.props.initialNumber} 
+      inputField = <ImmutableSquare number={this.props.initialNumber}
                                     isConflict={this.props.isConflict}/>
     }
     else if (this.props.isSelected && this.props.isFillMode) {
-      inputField = <SelectedMutableSquare number={this.props.currentNumber} 
+      inputField = <SelectedMutableSquare number={this.props.currentNumber}
                                           isError={this.props.isError}
                                           isConflict={this.props.isConflict}
-                                          handleInputFieldChange={(event) => this.handleInputFieldChange(event)} />
+                                          handleInputFieldChange={(event) => this.handleInputFieldChange(event)}/>
     }
     else if (!this.props.currentNumber && (this.hasAnyCandidateSquares() || isCandidateMode)) {
       inputField = <CandidateSquare candidateSquares={this.props.candidateSquares}
-                                    handleCandidateSquareClick={(i) => this.handleCandidateSquareClick(i)} />
+                                    handleCandidateSquareClick={(i) => this.handleCandidateSquareClick(i)}/>
     }
     else {
-      inputField =  <UnselectedMutableSquare number={this.props.currentNumber} 
-                                             isError={this.props.isError} 
-                                             isConflict={this.props.isConflict}/> 
+      inputField = <UnselectedMutableSquare number={this.props.currentNumber}
+                                            isError={this.props.isError}
+                                            isConflict={this.props.isConflict}/>
     }
 
     const selectedStyle = this.props.isSelected ? " selected" : "";
@@ -222,18 +222,19 @@ class CandidateSquare extends React.Component {
   constructor() {
     super();
   }
+
   render() {
-      //create an array of candidate squares filled with the numbers from 1 to 9. This will be the 3x3 grid
-      let candidateSquares =  [...Array(9).keys()].map(i => <SingleCandidateSquare key={i} 
-                                                                                   number={i + 1} 
-                                                                                   isSelected={this.props.candidateSquares[i]} 
-                                                                                   handleClick={() => this.props.handleCandidateSquareClick(i + 1)} />);
-      return (
-        <div className="candidate-squares-container">
-          {candidateSquares}
-         </div>
-      );
-    }
+    //create an array of candidate squares filled with the numbers from 1 to 9. This will be the 3x3 grid
+    let candidateSquares = [...Array(9).keys()].map(i => <SingleCandidateSquare key={i}
+                                                                                number={i + 1}
+                                                                                isSelected={this.props.candidateSquares[i]}
+                                                                                handleClick={() => this.props.handleCandidateSquareClick(i + 1)}/>);
+    return (
+      <div className="candidate-squares-container">
+        {candidateSquares}
+      </div>
+    );
+  }
 }
 
 CandidateSquare.propTypes = {

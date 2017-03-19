@@ -30,7 +30,7 @@ export default class GameContainer extends React.Component {
   }
 
   /**
-   * @param {Error} 
+   * @param {Error}
    */
   setSelectedError(error) {
     this.setState({
@@ -49,34 +49,34 @@ export default class GameContainer extends React.Component {
     //so we don't end up passing a stale number down to the new square
     this.setLastSelectedNumber(ValidInputEnum.NOTHING);
   }
-  
+
 
   render() {
     return (
-    <div className="game-container">
-      <div className="game-header">
-        Sudoku
-      </div>
-      <div className="play-container">
-        <div className="board-and-error-container">
-          <Board selectedError={this.state.selectedError} 
-                 isFillMode={this.state.isFillMode} 
-                 onErrors={(errors) => this.setErrors(errors)}
-                 lastSelectedNumber={this.state.lastSelectedNumber}  
-                 handleSquareSelection={() => this.handleSquareSquareSelection()}/>
-          <div className="error-panel-and-number-input-panel">
-            <ErrorPanel errors={this.state.errors} onErrorSelection={(error) => this.setSelectedError(error)}/>
-            <NumberInputPanel handleModeChange={(isFillMode) => this.setMode(isFillMode)} 
-                              isFillMode={this.state.isFillMode}
-                              handleNumberButtonPressed={(number) => this.setLastSelectedNumber(number)} />
-          </div>
+      <div className="game-container">
+        <div className="game-header">
+          Sudoku
         </div>
-        {/*<ButtonPanel showErrors={() => this.shouldShowErrors(true)} 
-                       isFillMode={this.state.isFillMode}
-                       handleModeChange={(isFillMode) => this.setMode(isFillMode)}
-        />*/}
+        <div className="play-container">
+          <div className="board-and-error-container">
+            <Board selectedError={this.state.selectedError}
+                   isFillMode={this.state.isFillMode}
+                   onErrors={(errors) => this.setErrors(errors)}
+                   lastSelectedNumber={this.state.lastSelectedNumber}
+                   handleSquareSelection={() => this.handleSquareSquareSelection()}/>
+            <div className="error-panel-and-number-input-panel">
+              <ErrorPanel errors={this.state.errors} onErrorSelection={(error) => this.setSelectedError(error)}/>
+              <NumberInputPanel handleModeChange={(isFillMode) => this.setMode(isFillMode)}
+                                isFillMode={this.state.isFillMode}
+                                handleNumberButtonPressed={(number) => this.setLastSelectedNumber(number)}/>
+            </div>
+          </div>
+          {/*<ButtonPanel showErrors={() => this.shouldShowErrors(true)}
+           isFillMode={this.state.isFillMode}
+           handleModeChange={(isFillMode) => this.setMode(isFillMode)}
+           />*/}
+        </div>
       </div>
-    </div>
-  );
+    );
   }
 }
