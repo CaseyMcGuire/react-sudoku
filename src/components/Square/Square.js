@@ -8,9 +8,6 @@ import './Square.css';
 export default class Square extends React.Component {
   constructor() {
     super();
-    this.state = {
-      candidateSquares: Array(9).fill(false) /* Store the toggle state of this square if it was ever in candidate mode */
-    };
   }
 
   /**

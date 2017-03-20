@@ -12,8 +12,11 @@ export default class ErrorPanel extends React.Component {
 
   render() {
     //fix this
-    const errorDisplay = this.props.errors.map(i => <li key={'(' + i.x + ',' + i.y + ')'}
-                                                        onClick={() => this.props.onErrorSelection(i)}>column: {i.x} row: {i.y}</li>)
+    const errorDisplay = this.props.errors.map(error => <ErrorListing key={'(' + error.x + ',' + error.y + ')'}
+                                                                      error={error}
+                                                                      selectedError={this.props.selectedError}
+                                                                      onErrorSelection={this.props.onErrorSelection}/> );
+
     return (
       <div className="error-panel">
         <div className="error-panel-header">
@@ -24,15 +27,31 @@ export default class ErrorPanel extends React.Component {
             {errorDisplay}
           </ul>
         </div>
-        <button className="clear-error-button" onClick={() => this.props.onErrorSelection(null)}>Clear</button>
       </div>
     );
   }
+}
+
+function ErrorListing(props) {
+  let errorStyling;
+  if (Object.is(props.selectedError, props.error)) {
+    errorStyling = " selected-error-listing";
+  }
+  else {
+    errorStyling = "";
+  }
+  return (
+    <li className={"error-listing" + errorStyling} onClick={() => props.onErrorSelection(props.error)}>
+      column: {props.error.x} row: {props.error.y}
+    </li>
+  );
 }
 
 ErrorPanel.propTypes = {
   /** An array of {Error} objects that represent each error present in the board */
   errors: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Error)),
   /** Callback that takes the error the user clicked on. */
-  onErrorSelection: React.PropTypes.func
+  onErrorSelection: React.PropTypes.func,
+  /** The error currently being displayed on the board */
+  selectedError: React.PropTypes.instanceOf(Error)
 };

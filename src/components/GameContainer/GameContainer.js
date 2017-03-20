@@ -38,6 +38,15 @@ export default class GameContainer extends React.Component {
     })
   }
 
+  handleErrorSelection(error) {
+    if (Object.is(error, this.state.selectedError)) {
+      this.setSelectedError(null);
+    }
+    else {
+      this.setSelectedError(error);
+    }
+  }
+
   setLastSelectedNumber(number) {
     this.setState({
       lastSelectedNumber: number
@@ -65,7 +74,9 @@ export default class GameContainer extends React.Component {
                    lastSelectedNumber={this.state.lastSelectedNumber}
                    handleSquareSelection={() => this.handleSquareSquareSelection()}/>
             <div className="error-panel-and-number-input-panel">
-              <ErrorPanel errors={this.state.errors} onErrorSelection={(error) => this.setSelectedError(error)}/>
+              <ErrorPanel errors={this.state.errors}
+                          selectedError={this.state.selectedError}
+                          onErrorSelection={(error) => this.handleErrorSelection(error)}/>
               <NumberInputPanel handleModeChange={(isFillMode) => this.setMode(isFillMode)}
                                 isFillMode={this.state.isFillMode}
                                 handleNumberButtonPressed={(number) => this.setLastSelectedNumber(number)}/>

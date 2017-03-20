@@ -1,7 +1,7 @@
 .error-panel {
 	border: solid 1px #000000;
 	display: inline-block;
-	height: 50%;
+	height: 35%;
 	vertical-align: top;
 	width: 190px;
 }
@@ -12,32 +12,41 @@
 	width: 100%;
 }
 
-.error-list > li {
-	cursor: pointer;
-}
-
 .error-title {
 	font-size: 25px;
 }
 
 .error-list-container {
-	height: 74%;
+	height: 60%;
 }
 
-.clear-error-button {
-	background-color: #B4B4B4;
-    border: none;
-    padding: 8px 50px;
+.error-listing {
+	cursor: pointer;
+	width: 80%;
+	margin: 0 auto;
+}
+
+.error-listing {
+	background-image: linear-gradient(top, #CECECE, #B4B4B4);
+	border: none;
+	padding: 1px 11px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-    margin: 4px 2px;
+    margin: 1px;
     cursor: pointer;
 	color: #000000;
-	border-radius: 6px;
+	border-radius: 3px;
 }
 
-.clear-error-button:hover {
-	background-color: #CECECE;
+.error-listing:hover {
+	box-shadow: 0 0 3px #193047;
+}
+.error-listing.selected-error-listing {
+	box-shadow: inset 0 0 7px #193047;
+}
+
+.error-listing.selected-error-listing:hover {
+	box-shadow: 0 0 2px #193047, inset 0 0 7px #193047;
 }
