@@ -7,6 +7,10 @@ import {ValidInputEnum} from '../NumberInputPanel/NumberInputPanel';
  * The actual 9x9 sudoku game board
  */
 export default class Board extends React.Component {
+
+  /** The token that indicates the a square is being cleared (i.e. its contents are being deleted.) */
+  static CLEAR = '';
+
   constructor() {
     super();
     this.state = {
@@ -59,12 +63,7 @@ export default class Board extends React.Component {
       case ValidInputEnum.NOTHING:
         return;
       case ValidInputEnum.CLEAR:
-        if (this.props.isFillMode) {
-          this.setBoardValue(selectedX, selectedY, '');
-        }
-        else {
-          this.clearCandidatesForSquare(selectedX, selectedY);
-        }
+        this.handleSquareChange(selectedX, selectedY, Board.CLEAR)
         break;
       case ValidInputEnum.ONE:
       case ValidInputEnum.TWO:
@@ -76,12 +75,7 @@ export default class Board extends React.Component {
       case ValidInputEnum.EIGHT:
       case ValidInputEnum.NINE:
         //Handle number input from the number input panel here by updating the state of the board.
-        if (this.props.isFillMode) {
-          this.setBoardValue(selectedX, selectedY, numberPanelInput + '');
-        }
-        else {
-          this.toggleCandidateForSquare(selectedX, selectedY, numberPanelInput);
-        }
+        this.handleSquareChange(selectedX, selectedY, numberPanelInput);
         break;
       default:
         console.log('non-exhaustive pattern: ' + numberPanelInput);
@@ -359,17 +353,24 @@ export default class Board extends React.Component {
   /**
    * @param {number} x The x-coordinate of the changed square
    * @param {number} y The y-coordinate of the changed square
-   * @param {number} value The value that the board coordinate was changed to.
+   * @param {number | string} value The value that the board coordinate was changed to.
    */
   handleSquareChange(x, y, value) {
+    const shouldClear = value === Board.CLEAR;
     if (this.props.isFillMode) {
-      this.setBoardValue(x, y, value, () => {
+      this.setBoardValue(x, y, value + '', () => {
         const errors = this.getErrors();
         this.props.onErrors(errors.errors);
       });
     }
-    else {
-      this.toggleCandidateForSquare(x, y, value);
+    else {//candidate mode
+      if (shouldClear) {
+        this.clearCandidatesForSquare(x, y);
+      }
+      else {
+        //If they haven't opted to clear the square, they can only be toggling a single candidate square
+        this.toggleCandidateForSquare(x, y, value);
+      }
     }
     this.props.handleSquareSelection();
   }
@@ -385,7 +386,7 @@ export default class Board extends React.Component {
     this.props.handleSquareSelection();
   }
 
-  /** @return True iff this sudoku puzzle is solved */
+  /** @return {boolean} True iff this sudoku puzzle is solved */
   isSolved() {
     //if there are any errors, then (obviously) the puzzle isn't solved
     const errors = this.getErrors();

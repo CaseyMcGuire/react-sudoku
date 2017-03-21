@@ -53,7 +53,7 @@ export default class GameContainer extends React.Component {
     });
   }
 
-  handleSquareSquareSelection() {
+  handleSquareSelection() {
     //after a new square is selected, set the last selected number to null
     //so we don't end up passing a stale number down to the new square
     this.setLastSelectedNumber(ValidInputEnum.NOTHING);
@@ -72,7 +72,7 @@ export default class GameContainer extends React.Component {
                    isFillMode={this.state.isFillMode}
                    onErrors={(errors) => this.setErrors(errors)}
                    lastSelectedNumber={this.state.lastSelectedNumber}
-                   handleSquareSelection={() => this.handleSquareSquareSelection()}/>
+                   handleSquareSelection={() => this.handleSquareSelection()}/>
             <div className="error-panel-and-number-input-panel">
               <ErrorPanel errors={this.state.errors}
                           selectedError={this.state.selectedError}
