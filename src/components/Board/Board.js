@@ -274,7 +274,7 @@ export default class Board extends React.Component {
       //  1) it duplicates another number in this row, and
       //  2) it was *not* part of the initial board (since we only want to highlight user errors)
       if (valueInRow === currentNumber) {
-        errors.push(new Conflict(curX, y, true, false, false));
+        errors.push(new Conflict(curX, y));
       }
     }
     return errors;
@@ -292,7 +292,7 @@ export default class Board extends React.Component {
       }
       const valueInColumn = this.getBoardValue(x, curY);
       if (valueInColumn === currentNumber) {
-        errors.push(new Conflict(x, curY, false, true, false));
+        errors.push(new Conflict(x, curY));
       }
     }
     return errors;
@@ -316,7 +316,7 @@ export default class Board extends React.Component {
 
         const value = this.getBoardValue(column, row);
         if (value === currentNumber) {
-          errors.push(new Conflict(column, row, false, false, true));
+          errors.push(new Conflict(column, row));
         }
       }
     }
@@ -490,14 +490,12 @@ export class Error {
 
 class Conflict {
   /**
-   *
+   * @param {number} x The x-coordinate of the conflict.
+   * @param {number} y The y-coordinate of the conflict.
    */
-  constructor(x, y, row, column, region) {
+  constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.row = row;
-    this.column = column;
-    this.region = region;
   }
 }
 

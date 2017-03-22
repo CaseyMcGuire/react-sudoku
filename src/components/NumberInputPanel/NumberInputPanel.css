@@ -53,25 +53,56 @@
 }
 
 .single-mode-button-container {
-  width: 50%;
-  display: inline-block;
+	display: inline-block;
+	vertical-align: top;
 }
 
 .mode-button {
-  margin: 0 auto;
-  cursor: pointer;
-  margin-top: 3px;
-  color: #4B7DBF;
-  text-align: center;
-  width: 43px;
+    cursor: pointer;
+	color: #4B7DBF;
+	text-align: center;
+	width: 60px;
+	height: 62px;
+	margin-left: 12px;
+	margin-right: 12px;
+	border: solid 1px #E6E6E6;
+
 }
 
 .mode-button.selected {
   color: #FFFFFF;
   background-color: #4B7DBF;
-  border-radius: 10px;
+  border-radius: 5px;
+}
+
+.mode-button.not-selected:hover {
+	background-color: rgba(75, 125, 191, 0.2);
+}
+
+.candidate-mode-button.selected .candidate-square-mock {
+	background-color: #FDFDFD;
+}
+
+.candidate-mode-button .candidate-square-mock {
+	background-color: #4B7DBF;
 }
 
 .fill-mode-button {
-  font-size: 35px;
+  font-size: 50px;
+}
+
+.candidate-square-mock-container {
+	padding-top: 1px;
+	padding-bottom: 3px;
+}
+
+.candidate-square-mock {
+	width: 0px;
+	height: 0px;
+	display: inline-block;
+	margin-left: 2px;
+	margin-right: 2px;
+	padding: 6px;
+	background-color: gray;
+	border-radius: 2px;
 }

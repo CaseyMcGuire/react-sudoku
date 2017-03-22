@@ -36,19 +36,21 @@ function NumberButton(props) {
 }
 
 function FillButton(props) {
-  const styleNames = "mode-button fill-mode-button" + (props.isFillMode ? " selected" : "");
+  const styleNames = "mode-button fill-mode-button" + (props.isFillMode ? " selected" : " not-selected");
   return (
     <div title="Fill Mode" className={styleNames} onClick={props.onClick}>
-      F
+      1
     </div>
   );
 }
 
 function CandidateButton(props) {
-  const styleNames = "mode-button fill-mode-button" + (!props.isFillMode ? " selected" : "");
+  const styleNames = "mode-button candidate-mode-button" + (!props.isFillMode ? " selected" : " not-selected");
   return (
     <div title="Candidate Mode" className={styleNames} onClick={props.onClick}>
-      C
+      <div className="candidate-square-mock-container">
+        {[...Array(9).keys()].map(i => <div key={i} className="candidate-square-mock"></div>)}
+      </div>
     </div>
   );
 }
