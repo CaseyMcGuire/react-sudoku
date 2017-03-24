@@ -1,10 +1,10 @@
 import React from 'react';
 import Board from '../Board/Board';
-import ButtonPanel from '../ButtonPanel/ButtonPanel';
 import ErrorPanel from '../ErrorPanel/ErrorPanel';
 import NumberInputPanel from '../NumberInputPanel/NumberInputPanel';
 import './GameContainer.css';
 import {ValidInputEnum} from '../NumberInputPanel/NumberInputPanel';
+import Timer from '../Timer/Timer.js';
 
 export default class GameContainer extends React.Component {
   constructor() {
@@ -77,15 +77,12 @@ export default class GameContainer extends React.Component {
               <ErrorPanel errors={this.state.errors}
                           selectedError={this.state.selectedError}
                           onErrorSelection={(error) => this.handleErrorSelection(error)}/>
+              <Timer />
               <NumberInputPanel handleModeChange={(isFillMode) => this.setMode(isFillMode)}
                                 isFillMode={this.state.isFillMode}
                                 handleNumberButtonPressed={(number) => this.setLastSelectedNumber(number)}/>
             </div>
           </div>
-          {/*<ButtonPanel showErrors={() => this.shouldShowErrors(true)}
-           isFillMode={this.state.isFillMode}
-           handleModeChange={(isFillMode) => this.setMode(isFillMode)}
-           />*/}
         </div>
       </div>
     );
