@@ -12,8 +12,6 @@ export default class Timer extends React.Component {
   constructor() {
     super();
     this.state = {
-      /** Whether the timer is paused */
-      isPaused: false,
       /** Number of seconds the timer has been unpaused */
       secondsElapsed: 0,
       /** The formatted time that appears in the timer. */
@@ -30,7 +28,7 @@ export default class Timer extends React.Component {
   }
 
   tick() {
-    if (this.state.isPaused) {
+    if (this.props.isPaused) {
       return;
     }
     this.setState({
@@ -55,17 +53,11 @@ export default class Timer extends React.Component {
     });
   }
 
-  togglePause() {
-    this.setState({
-      isPaused: !this.state.isPaused
-    });
-  }
-
   render() {
-    let playSymbol = this.state.isPaused ? "\u25B6" : "\u25AE\u25AE";
+    let playSymbol = this.props.isPaused ? "\u25B6" : "\u25AE\u25AE";
     return (
       <div className="timer-container">
-        <div className="timer-play-button" onClick={() => this.togglePause()}>
+        <div className="timer-play-button" onClick={() => this.props.togglePause()}>
           {playSymbol}
         </div>
         <div className="timer">
@@ -74,4 +66,10 @@ export default class Timer extends React.Component {
       </div>
     );
   }
+}
+
+Timer.propTypes = {
+  /** Whether the timer is paused */
+  isPaused: React.PropTypes.bool.isRequired,
+  togglePause: React.PropTypes.func.isRequired
 }

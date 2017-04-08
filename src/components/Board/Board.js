@@ -26,16 +26,20 @@ export default class Board extends React.Component {
     const firstRow = regions.slice(0, 3);
     const secondRow = regions.slice(3, 6);
     const thirdRow = regions.slice(6, 9);
+
     return (
-      <div className="board">
-        <div className="row">
-          {firstRow}
-        </div>
-        <div className="row">
-          {secondRow}
-        </div>
-        <div className="row">
-          {thirdRow}
+      <div className="board-container">
+        {this.props.isPaused ? <PausePanel togglePause={this.props.togglePause}/> : ''}
+        <div className="board">
+          <div className="row">
+            {firstRow}
+          </div>
+          <div className="row">
+            {secondRow}
+          </div>
+          <div className="row">
+            {thirdRow}
+          </div>
         </div>
       </div>
     );
@@ -52,7 +56,8 @@ export default class Board extends React.Component {
    */
   handleNumberPanelInput(numberPanelInput) {
     //If we haven't selected a square yet, don't try to update the board
-    if (this.state.selectedSquare == null) {
+    //also, don't allow the board to change if the game is paused
+    if (this.state.selectedSquare == null || this.props.isPaused) {
       return;
     }
 
@@ -405,6 +410,22 @@ export default class Board extends React.Component {
     return true;
   }
 }
+/** @returns {XML} The panel that overlays the board when the game is paused.*/
+function PausePanel({togglePause}) {
+  return (
+    <div className="pause-panel">
+      <div className="pause-text-container">
+        <div className="pause-panel-text"> Paused </div>
+        <button onClick={togglePause} className="resume-button">Resume</button>
+      </div>
+    </div>
+  );
+}
+
+PausePanel.propTypes = {
+  /** Callback for when 'resume' button is pressed */
+  togglePause: React.PropTypes.func.isRequired
+};
 
 /**
  * A single 3x3 region in a Sudoku board.
@@ -506,5 +527,9 @@ Board.propTypes = {
   /** The error that the user clicked on */
   selectedError: React.PropTypes.instanceOf(Error),
   onErrors: React.PropTypes.func,
-  lastSelectedNumber: React.PropTypes.number
+  lastSelectedNumber: React.PropTypes.number,
+  /** Whether the game is paused or not. */
+  isPaused: React.PropTypes.bool.isRequired,
+  /** Callback for when 'Resume' button on pause panel is pressed */
+  togglePause: React.PropTypes.func.isRequired
 };

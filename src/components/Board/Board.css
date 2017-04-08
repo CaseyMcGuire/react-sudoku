@@ -1,11 +1,50 @@
-
-.board {
+.board-container {
   width: 600px;
   height: 600px;
   font-size: 20px;
   margin: 0 auto;
   display: inline-block;
   vertical-align: top;
+}
+
+.board {
+  height: 100%;
+  width: 100%;
+}
+
+.pause-panel {
+  position: absolute;
+  height: 600px;
+  width: 600px;
+  z-index: 2;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.pause-text-container {
+  position: relative;
+  top: 46%;
+}
+
+.pause-panel-text {
+  font-size: 40px;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.resume-button {
+  background-color: #337ab7;
+  color: #FFFFFF;
+  padding: 6px 11px;
+  border: none;
+  cursor: pointer;
+}
+
+.resume-button:hover {
+  background-color: #66ADEA;
 }
 
 .row {

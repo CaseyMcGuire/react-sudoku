@@ -93,6 +93,7 @@
 }
 
 .candidate-square-mock-container {
+	margin-top: 3px;
 	padding-top: 1px;
 	padding-bottom: 3px;
 }

@@ -13,7 +13,8 @@ export default class GameContainer extends React.Component {
       isFillMode: true,
       errors: [],
       selectedError: null,  //{Error}
-      lastSelectedNumber: ValidInputEnum.NOTHING //The last selected number from input panel
+      lastSelectedNumber: ValidInputEnum.NOTHING, //The last selected number from input panel
+      isPaused: false
     }
   }
 
@@ -53,6 +54,19 @@ export default class GameContainer extends React.Component {
     });
   }
 
+  handleNumberSelection(number) {
+    if (this.state.isPaused) {
+      return;
+    }
+    this.setLastSelectedNumber(number);
+  }
+
+  togglePause() {
+    this.setState({
+      isPaused: !this.state.isPaused
+    })
+  }
+
   handleSquareSelection() {
     //after a new square is selected, set the last selected number to null
     //so we don't end up passing a stale number down to the new square
@@ -72,15 +86,18 @@ export default class GameContainer extends React.Component {
                    isFillMode={this.state.isFillMode}
                    onErrors={(errors) => this.setErrors(errors)}
                    lastSelectedNumber={this.state.lastSelectedNumber}
-                   handleSquareSelection={() => this.handleSquareSelection()}/>
+                   handleSquareSelection={() => this.handleSquareSelection()}
+                   isPaused={this.state.isPaused}
+                   togglePause={() => this.togglePause()}/>
             <div className="error-panel-and-number-input-panel">
               <ErrorPanel errors={this.state.errors}
                           selectedError={this.state.selectedError}
                           onErrorSelection={(error) => this.handleErrorSelection(error)}/>
-              <Timer />
+              <Timer isPaused={this.state.isPaused}
+                     togglePause={() => this.togglePause()} />
               <NumberInputPanel handleModeChange={(isFillMode) => this.setMode(isFillMode)}
                                 isFillMode={this.state.isFillMode}
-                                handleNumberButtonPressed={(number) => this.setLastSelectedNumber(number)}/>
+                                handleNumberButtonPressed={(number) => this.handleNumberSelection(number)}/>
             </div>
           </div>
         </div>
