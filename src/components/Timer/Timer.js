@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import './Timer.css';
 
 /**
@@ -70,6 +71,6 @@ export default class Timer extends React.Component {
 
 Timer.propTypes = {
   /** Whether the timer is paused */
-  isPaused: React.PropTypes.bool.isRequired,
-  togglePause: React.PropTypes.func.isRequired
+  isPaused: PropTypes.bool.isRequired,
+  togglePause: PropTypes.func.isRequired
 }

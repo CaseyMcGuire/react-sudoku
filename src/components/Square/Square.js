@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import './Square.css';
 
 
@@ -104,23 +105,23 @@ export default class Square extends React.Component {
 
 Square.propTypes = {
   /** True if this square is the 'primary' error square */
-  isError: React.PropTypes.bool,
+  isError: PropTypes.bool,
   /** True if this square is in conflict with the 'primary' error square */
-  isConflict: React.PropTypes.bool,
+  isConflict: PropTypes.bool,
   /** The value that was in this square at the beginning of the game. Null if this square was empty.*/
-  initialNumber: React.PropTypes.string,
+  initialNumber: PropTypes.string,
   /** The value currently in this square. Null if there isn't a value in this square. */
-  currentNumber: React.PropTypes.string,
+  currentNumber: PropTypes.string,
   /** Callback for when the value inside a square has been changed */
-  onSquareChange: React.PropTypes.func,
+  onSquareChange: PropTypes.func,
   /** Callback for when a square is selected */
-  onSquareSelection: React.PropTypes.func,
+  onSquareSelection: PropTypes.func,
   /** True if the current board mode is Fill Mode */
-  isFillMode: React.PropTypes.bool,
+  isFillMode: PropTypes.bool,
   /** True if this square is the currently selected square (i.e. the last square the user clicked on) */
-  isSelected: React.PropTypes.bool,
+  isSelected: PropTypes.bool,
   /** The toggle state of the 9 possible candidates */
-  candidateSquares: React.PropTypes.arrayOf(React.PropTypes.bool)
+  candidateSquares: PropTypes.arrayOf(PropTypes.bool)
 };
 
 /******************************************
@@ -146,9 +147,9 @@ function ImmutableSquare(props) {
 
 ImmutableSquare.propTypes = {
   /** The number in this square */
-  number: React.PropTypes.string,
+  number: PropTypes.string,
   /** True iff this square is in conflict with the error square. */
-  isConflict: React.PropTypes.bool
+  isConflict: PropTypes.bool
 };
 
 function SelectedMutableSquare(props) {
@@ -176,13 +177,13 @@ function SelectedMutableSquare(props) {
 
 SelectedMutableSquare.propTypes = {
   /** The number in this square. */
-  number: React.PropTypes.string,
+  number: PropTypes.string,
   /** Callback when user changes number in square */
-  handleChange: React.PropTypes.func,
+  handleChange: PropTypes.func,
   /** True if this square is conficting with the selected error square */
-  isError: React.PropTypes.bool,
+  isError: PropTypes.bool,
   /** True iff this square is in conflict with the error square. */
-  isConflict: React.PropTypes.bool
+  isConflict: PropTypes.bool
 };
 
 function UnselectedMutableSquare(props) {
@@ -207,11 +208,11 @@ function UnselectedMutableSquare(props) {
 
 UnselectedMutableSquare.propTypes = {
   /** True if this square is the selected error */
-  isError: React.PropTypes.bool,
+  isError: PropTypes.bool,
   /** True if this square is conflicting with the selected error */
-  isConflict: React.PropTypes.bool,
+  isConflict: PropTypes.bool,
   /** The number in this square */
-  number: React.PropTypes.string
+  number: PropTypes.string
 };
 
 
@@ -236,9 +237,9 @@ class CandidateSquare extends React.Component {
 
 CandidateSquare.propTypes = {
   /** An array describing which of the candidate squares has been toggled */
-  candidateSquares: React.PropTypes.arrayOf(React.PropTypes.bool),
+  candidateSquares: PropTypes.arrayOf(PropTypes.bool),
   /** Callback when a single candidate square is clicked. */
-  handleCandidateSquareClick: React.PropTypes.func
+  handleCandidateSquareClick: PropTypes.func
 };
 
 class SingleCandidateSquare extends React.Component {
@@ -259,9 +260,9 @@ class SingleCandidateSquare extends React.Component {
 
 SingleCandidateSquare.propTypes = {
   /** This candidate square's number */
-  number: React.PropTypes.number,
+  number: PropTypes.number,
   /** True if this square has been toggled (i.e. whether it should be displayed) */
-  isSelected: React.PropTypes.bool,
+  isSelected: PropTypes.bool,
   /** Callback for when this square is clicked */
-  handleClick: React.PropTypes.func
+  handleClick: PropTypes.func
 };

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Square from '../Square/Square.js';
 import './Board.css';
 import {ValidInputEnum} from '../NumberInputPanel/NumberInputPanel';
@@ -424,7 +425,7 @@ function PausePanel({togglePause}) {
 
 PausePanel.propTypes = {
   /** Callback for when 'resume' button is pressed */
-  togglePause: React.PropTypes.func.isRequired
+  togglePause: PropTypes.func.isRequired
 };
 
 /**
@@ -523,13 +524,13 @@ class Conflict {
 //Have to put this down here since the Error class apparently isn't in scope yet.
 Board.propTypes = {
   /** True if the game is currenty in fill mode */
-  isFillMode: React.PropTypes.bool,
+  isFillMode: PropTypes.bool,
   /** The error that the user clicked on */
-  selectedError: React.PropTypes.instanceOf(Error),
-  onErrors: React.PropTypes.func,
-  lastSelectedNumber: React.PropTypes.number,
+  selectedError: PropTypes.instanceOf(Error),
+  onErrors: PropTypes.func,
+  lastSelectedNumber: PropTypes.number,
   /** Whether the game is paused or not. */
-  isPaused: React.PropTypes.bool.isRequired,
+  isPaused: PropTypes.bool.isRequired,
   /** Callback for when 'Resume' button on pause panel is pressed */
-  togglePause: React.PropTypes.func.isRequired
+  togglePause: PropTypes.func.isRequired
 };
