@@ -2,24 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Square from '../Square/Square.js';
 import './Board.css';
-import {ValidInputEnum} from '../NumberInputPanel/NumberInputPanel';
 
 /**
  * The actual 9x9 sudoku game board
  */
 export default class Board extends React.Component {
 
-  /** The token that indicates the a square is being cleared (i.e. its contents are being deleted.) */
-  static CLEAR = '';
-
   constructor() {
     super();
-    this.state = {
-      initialBoard: this.getEmptyBoard(getInitialBoard()),
-      currentBoard: this.getEmptyBoard(getInitialBoard()),
-      selectedSquare: null,
-      candidateSquaresBoard: this.getEmptyCandidateBoard()
-    };
   }
 
   render() {
@@ -44,48 +34,6 @@ export default class Board extends React.Component {
         </div>
       </div>
     );
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.handleNumberPanelInput(nextProps.lastSelectedNumber);
-  }
-
-  /**
-   * Handle an input from the number input panel.
-   *
-   * @param {ValidInputEnum} numberPanelInput The input from the number input panel.
-   */
-  handleNumberPanelInput(numberPanelInput) {
-    //If we haven't selected a square yet, don't try to update the board
-    //also, don't allow the board to change if the game is paused
-    if (this.state.selectedSquare == null || this.props.isPaused) {
-      return;
-    }
-
-    const selectedX = this.state.selectedSquare.x;
-    const selectedY = this.state.selectedSquare.y;
-
-    switch (numberPanelInput) {
-      case ValidInputEnum.NOTHING:
-        return;
-      case ValidInputEnum.CLEAR:
-        this.handleSquareChange(selectedX, selectedY, Board.CLEAR)
-        break;
-      case ValidInputEnum.ONE:
-      case ValidInputEnum.TWO:
-      case ValidInputEnum.THREE:
-      case ValidInputEnum.FOUR:
-      case ValidInputEnum.FIVE:
-      case ValidInputEnum.SIX:
-      case ValidInputEnum.SEVEN:
-      case ValidInputEnum.EIGHT:
-      case ValidInputEnum.NINE:
-        //Handle number input from the number input panel here by updating the state of the board.
-        this.handleSquareChange(selectedX, selectedY, numberPanelInput);
-        break;
-      default:
-        console.log('non-exhaustive pattern: ' + numberPanelInput);
-    }
   }
 
   getRegions() {
@@ -132,7 +80,7 @@ export default class Board extends React.Component {
         const isError = this.props.selectedError == null ? false : error.x === column && error.y === row;
 
         const curSquareIsSelected = this.isSquareSelected(row, column);
-        const isConflict = this.props.selectedError === null ? false : this.props.selectedError.hasConflict(column, row);
+        const isConflict = this.props.selectedError == null ? false : this.props.selectedError.hasConflict(column, row);
         squares[iter] = <Square key={key}
                                 isError={isError}
                                 isConflict={isConflict}
@@ -153,91 +101,23 @@ export default class Board extends React.Component {
   }
 
   isSquareSelected(row, column) {
-    if (this.state.selectedSquare == null) {
+    if (this.props.selectedSquare === null) {
       return false;
     }
-    return row === this.state.selectedSquare.y && column === this.state.selectedSquare.x;
+    return row === this.props.selectedSquare.row && column === this.props.selectedSquare.column;
   }
 
-  // (row, col)
-  getEmptyBoard(initialBoard) {
-    const board = Array(9).fill(null);
-    for (let i = 0; i < board.length; i++) {
-      board[i] = Array(9).fill(null);
-      for (let j = 0; j < board[i].length; j++) {
-        board[i][j] = initialBoard[i][j];
-      }
-    }
-    return board;
-  }
-
-  /** @returns {Array<Array<boolean>>} Returns an empty  */
-  getEmptyCandidateBoard() {
-    const candidateBoard = Array(9).fill(null);
-    for (let i = 0; i < candidateBoard.length; i++) {
-      candidateBoard[i] = Array(9).fill(null);
-      for (let j = 0; j < candidateBoard[i].length; j++) {
-        candidateBoard[i][j] = Array(9).fill(false);
-      }
-    }
-    return candidateBoard;
-  }
 
   /**
    * Get the the 9-element array describing the toggle state of each candidate square for
    * this particular square.
    *
-   * @param x The x-coordinate of the square
-   * @param y The y-coordinate of the square
+   * @param x {number} The x-coordinate of the square
+   * @param y {number} The y-coordinate of the square
    * @returns {Array<Boolean>} The 9-element array representing the toggle state of the given candidate square
    */
   getCandidateForSquare(x, y) {
-    return this.state.candidateSquaresBoard[y][x];
-  }
-
-  toggleCandidateForSquare(x, y, value) {
-    const values = this.state.candidateSquaresBoard[y][x].slice();
-    //because the candidate squares have an index origin of 1 and arrays have an index origin of 0, we need
-    //to subtract 1 here.
-    values[value - 1] = !values[value - 1];
-    this.setCandidatesForSquare(x, y, values);
-  }
-
-  /**
-   * Set the state of the candidate squares for the given sudoku square.
-   *
-   * @param {number} x The x-coordinate of the sudoku square
-   * @param {number} y The y-coordinate of the sudoku square
-   * @param {Array<number>} values A 9-element array of the toggle state of each candidate square.
-   */
-  setCandidatesForSquare(x, y, values) {
-    const newCandidateBoard = Array(9).fill(null);
-    const oldCandidateBoard = this.state.candidateSquaresBoard;
-    for (let row = 0; row < newCandidateBoard.length; row++) {
-      newCandidateBoard[row] = Array(9).fill(null);
-      for (let column = 0; column < newCandidateBoard[row].length; column++) {
-        if (x === column && y === row) {
-          newCandidateBoard[row][column] = values;
-        }
-        else {
-          newCandidateBoard[row][column] = oldCandidateBoard[row][column];
-        }
-      }
-    }
-
-    this.setState({
-      candidateSquaresBoard: newCandidateBoard
-    });
-  }
-
-  /**
-   * Clears all displayed candidate squares from the passed square.
-   *
-   * @param {number} x The x-coordinate of the square to clear
-   * @param {number} y The y-coordinate of the square to clear
-   */
-  clearCandidatesForSquare(x, y) {
-    this.setCandidatesForSquare(x, y, Array(9).fill(false));
+    return this.props.candidateBoard[y][x];
   }
 
   /**
@@ -247,8 +127,8 @@ export default class Board extends React.Component {
    */
   getErrors() {
     let errors = new Errors();
-    for (let y = 0; y < this.state.currentBoard.length; y++) {
-      for (let x = 0; x < this.state.currentBoard[y].length; x++) {
+    for (let y = 0; y < this.props.currentBoard.length; y++) {
+      for (let x = 0; x < this.props.currentBoard[y].length; x++) {
         //errors from initial square shouldn't be 'primary' errors
         if (this.getInitialBoardValue(x, y)) {
           continue;
@@ -330,30 +210,11 @@ export default class Board extends React.Component {
   }
 
   getInitialBoardValue(x, y) {
-    return this.state.initialBoard[y][x];
+    return this.props.initialBoard[y][x];
   }
 
   getBoardValue(x, y) {
-    return this.state.currentBoard[y][x];
-  }
-
-  /**
-   * Sets the value of a square in the board.
-   *
-   * @param {number} x The x-coordinate of the square to set
-   * @param {number} y The y-coordinate of the square to set
-   * @param {number} value The value to set the square to
-   * @param {function} callback An optional function to call after the state has been updated
-   */
-  setBoardValue(x, y, value, callback) {
-    const boardCopy = [];
-    for (let row of this.state.currentBoard) {
-      boardCopy.push(row.slice());
-    }
-    boardCopy[y][x] = value;
-    this.setState({
-      currentBoard: boardCopy
-    }, callback);
+    return this.props.currentBoard[y][x];
   }
 
   /**
@@ -362,34 +223,15 @@ export default class Board extends React.Component {
    * @param {number | string} value The value that the board coordinate was changed to.
    */
   handleSquareChange(x, y, value) {
-    const shouldClear = value === Board.CLEAR;
     if (this.props.isFillMode) {
-      this.setBoardValue(x, y, value + '', () => {
-        const errors = this.getErrors();
-        this.props.onErrors(errors.errors);
-      });
+      this.props.onSquareChange(x, y, value);
+    } else {
+      this.props.onCandidateSquareChange(x, y, value);
     }
-    else {//candidate mode
-      if (shouldClear) {
-        this.clearCandidatesForSquare(x, y);
-      }
-      else {
-        //If they haven't opted to clear the square, they can only be toggling a single candidate square
-        this.toggleCandidateForSquare(x, y, value);
-      }
-    }
-    this.props.handleSquareSelection();
   }
 
   handleSquareSelection(row, column) {
-    //don't do anything if this is the same square that's already selected
-    if (this.state.selectedSquare !== null && (row === this.state.selectedSquare.x && column === this.state.selectedSquare.y)) {
-      return;
-    }
-    this.setState({
-      selectedSquare: {x: column, y: row}
-    });
-    this.props.handleSquareSelection();
+    this.props.onSquareSelection(row, column);
   }
 
   /** @return {boolean} True iff this sudoku puzzle is solved */
@@ -401,9 +243,9 @@ export default class Board extends React.Component {
     }
 
     //if any square doesn't have an entry, then the puzzle can't be solved.
-    for (let i = 0; i < this.state.currentBoard; i++) {
-      for (let j = 0; j < this.state.currentBoard[i]; j++) {
-        if (!this.state.currentBoard[i][j]) {
+    for (let i = 0; i < this.props.currentBoard; i++) {
+      for (let j = 0; j < this.props.currentBoard[i]; j++) {
+        if (!this.props.currentBoard[i][j]) {
           return false;
         }
       }
@@ -524,10 +366,10 @@ class Conflict {
 //Have to put this down here since the Error class apparently isn't in scope yet.
 Board.propTypes = {
   /** True if the game is currenty in fill mode */
-  isFillMode: PropTypes.bool,
+  isFillMode: PropTypes.bool.isRequired,
   /** The error that the user clicked on */
   selectedError: PropTypes.instanceOf(Error),
-  onErrors: PropTypes.func,
+  onErrors: PropTypes.func.isRequired,
   lastSelectedNumber: PropTypes.number,
   /** Whether the game is paused or not. */
   isPaused: PropTypes.bool.isRequired,
