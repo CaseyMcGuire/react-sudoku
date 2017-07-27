@@ -20,7 +20,7 @@ const mapDispatchToProps = (dispatch) => {
         x: x,
         y: y,
         value: value
-      }))
+      }));
     },
     onSquareSelection: (row, column) => {
       dispatch(setSelectedSquare({
@@ -36,7 +36,7 @@ const mapDispatchToProps = (dispatch) => {
         x: x,
         y: y,
         value: value
-      }))
+      }));
     }
   }
 }

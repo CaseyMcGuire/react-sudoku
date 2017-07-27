@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import Controls from "../components/Controls/Controls";
-import { setIsFillMode, onErrorSelection, setBoardValue, togglePause } from '../actions';
+import { setIsFillMode, onErrorSelection, setBoardValue, togglePause, setCandidateBoardValue } from '../actions';
 
 const mapStateToProps = (state) => {
   return {
@@ -29,8 +29,15 @@ const mapDispatchToProps = (dispatch) => {
     },
     togglePause: () => {
       dispatch(togglePause());
+    },
+    onCandidateSquareChange: (x, y, value) => {
+      dispatch(setCandidateBoardValue({
+        x: x,
+        y: y,
+        value: value
+      }));
     }
-  };
+  }
 }
 
 const ControlsContainer = connect(

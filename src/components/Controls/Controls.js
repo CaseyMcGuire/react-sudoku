@@ -16,7 +16,12 @@ export default class Controls extends React.Component {
     }
     const row = this.props.selectedSquare.row;
     const column = this.props.selectedSquare.column;
-    this.props.onNumberButtonInput(column, row, number);
+    if (this.props.isFillMode) {
+      this.props.onNumberButtonInput(column, row, number);
+    }
+    else {
+      this.props.onCandidateSquareChange(column, row, number);
+    }
   }
 
   render() {
