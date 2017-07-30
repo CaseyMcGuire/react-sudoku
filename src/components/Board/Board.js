@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Square from '../Square/Square.js';
 import './Board.css';
+import SudokuBoard from '../../sudoku/SudokuBoard';
+import SudokuError from '../../sudoku/SudokuError';
 
 /**
  * The actual 9x9 sudoku game board
@@ -10,6 +12,18 @@ export default class Board extends React.Component {
 
   constructor() {
     super();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    //Hmmm... not sure about this. Should this go in the redux store?
+    const newBoard = new SudokuBoard(nextProps.currentBoard, nextProps.initialBoard);
+    const oldBoard = new SudokuBoard(this.props.currentBoard, this.props.initialBoard);
+
+    const oldErrors = oldBoard.getErrors();
+    const newErrors = newBoard.getErrors();
+    if (!oldErrors.equals(newErrors)) {
+      this.props.onErrors(newErrors.errors);
+    }
   }
 
   render() {
@@ -107,7 +121,6 @@ export default class Board extends React.Component {
     return row === this.props.selectedSquare.row && column === this.props.selectedSquare.column;
   }
 
-
   /**
    * Get the the 9-element array describing the toggle state of each candidate square for
    * this particular square.
@@ -118,95 +131,6 @@ export default class Board extends React.Component {
    */
   getCandidateForSquare(x, y) {
     return this.props.candidateBoard[y][x];
-  }
-
-  /**
-   * Return all errors currently present in the board.
-   *
-   * @return {Errors}
-   */
-  getErrors() {
-    let errors = new Errors();
-    for (let y = 0; y < this.props.currentBoard.length; y++) {
-      for (let x = 0; x < this.props.currentBoard[y].length; x++) {
-        //errors from initial square shouldn't be 'primary' errors
-        if (this.getInitialBoardValue(x, y)) {
-          continue;
-        }
-        const currentSquareConflicts = this.getRowConflicts(x, y).concat(this.getColumnConflicts(x, y)).concat(this.getRegionConflicts(x, y));
-        if (currentSquareConflicts.length > 0) {
-          const error = new Error(x, y, currentSquareConflicts);
-          errors.add(error);
-        }
-      }
-    }
-    return errors;
-  }
-
-  //TODO: The code to check rows and columns is super similar... See if the logic
-  //can be combined somehow...
-  getRowConflicts(x, y) {
-    const currentNumber = this.getBoardValue(x, y);
-    const errors = [];
-    if (!currentNumber) {
-      return errors;
-    }
-    for (let curX = 0; curX < 9; curX++) {
-      if (curX === x) {
-        continue;
-      }
-      const valueInRow = this.getBoardValue(curX, y);
-      //right now, we will say this square constitutes an error iff:
-      //  1) it duplicates another number in this row, and
-      //  2) it was *not* part of the initial board (since we only want to highlight user errors)
-      if (valueInRow === currentNumber) {
-        errors.push(new Conflict(curX, y));
-      }
-    }
-    return errors;
-  }
-
-  getColumnConflicts(x, y) {
-    const currentNumber = this.getBoardValue(x, y);
-    const errors = [];
-    if (!currentNumber) {
-      return errors;
-    }
-    for (let curY = 0; curY < 9; curY++) {
-      if (curY === y) {
-        continue;
-      }
-      const valueInColumn = this.getBoardValue(x, curY);
-      if (valueInColumn === currentNumber) {
-        errors.push(new Conflict(x, curY));
-      }
-    }
-    return errors;
-  }
-
-  getRegionConflicts(x, y) {
-    const currentNumber = this.getBoardValue(x, y);
-    const errors = [];
-    if (!currentNumber) {
-      return errors;
-    }
-
-    //get the top-left coordinate of whichever region this square is in
-    const rowOffset = y < 3 ? 0 : y < 6 ? 3 : 6;
-    const columnOffset = x < 3 ? 0 : x < 6 ? 3 : 6;
-    for (let row = rowOffset; row < rowOffset + 3; row++) {
-      for (let column = columnOffset; column < columnOffset + 3; column++) {
-        if (x === column && y === row) {
-          continue;
-        }
-
-        const value = this.getBoardValue(column, row);
-        if (value === currentNumber) {
-          errors.push(new Conflict(column, row));
-        }
-      }
-    }
-    return errors;
   }
 
   getInitialBoardValue(x, y) {
@@ -233,26 +157,8 @@ export default class Board extends React.Component {
   handleSquareSelection(row, column) {
     this.props.onSquareSelection(row, column);
   }
-
-  /** @return {boolean} True iff this sudoku puzzle is solved */
-  isSolved() {
-    //if there are any errors, then (obviously) the puzzle isn't solved
-    const errors = this.getErrors();
-    if (errors) {
-      return false;
-    }
-
-    //if any square doesn't have an entry, then the puzzle can't be solved.
-    for (let i = 0; i < this.props.currentBoard; i++) {
-      for (let j = 0; j < this.props.currentBoard[i]; j++) {
-        if (!this.props.currentBoard[i][j]) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
 }
+
 /** @returns {XML} The panel that overlays the board when the game is paused.*/
 function PausePanel({togglePause}) {
   return (
@@ -281,86 +187,6 @@ class Region extends React.Component {
       </div>
     );
   }
-
-}
-
-//test board. Replace with ajax call eventually
-function getInitialBoard() {
-  return [
-    ["", "", "", "", "", "", "", "", ""],
-    ["", "8", "9", "4", "1", "", "", "", ""],
-    ["", "", "6", "7", "", "", "1", "9", "3"],
-    ["2", "", "", "", "", "", "7", "", ""],
-    ["3", "4", "", "6", "", "", "", "1", ""],
-    ["", "", "", "9", "", "", "", "", "5"],
-    ["", "", "", "", "2", "", "", "5", ""],
-    ["6", "5", "", "", "4", "", "", "2", ""],
-    ["7", "3", "", "1", "", "", "", "", ""]
-  ]
-}
-
-class Errors {
-  constructor() {
-    this.errors = [];
-  }
-
-  add(error) {
-    this.errors.push(error)
-  }
-
-  hasError(x, y) {
-    return this.getError(x, y) !== null;
-  }
-
-  getError(x, y) {
-    for (let error of this.errors) {
-      if (error.x === x && error.y === y) {
-        return error;
-      }
-    }
-    return null;
-  }
-}
-
-export class Error {
-
-  /**
-   * @param {number} x The x-coordinate (column) of the error
-   * @param {number} y The y-coordinate (row) of the error
-   * @return {Array<Conflict>} conflicts All the squares this error has conflicts with.
-   */
-  constructor(x, y, conflicts) {
-    this.x = x;
-    this.y = y;
-    this.conflicts = conflicts;
-  }
-
-  /**
-   * Returns whether this error square has a conflict at the passed coordinates.
-   *
-   * @param {number} row The row to check
-   * @param {number} column The column to check
-   * @return {boolean} True if this error has a conflict at the passed coordinates
-   */
-  hasConflict(row, column) {
-    for (let conflict of this.conflicts) {
-      if (conflict.x === row && conflict.y === column) {
-        return true;
-      }
-    }
-    return false;
-  }
-}
-
-class Conflict {
-  /**
-   * @param {number} x The x-coordinate of the conflict.
-   * @param {number} y The y-coordinate of the conflict.
-   */
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-  }
 }
 
 //Have to put this down here since the Error class apparently isn't in scope yet.
@@ -368,7 +194,7 @@ Board.propTypes = {
   /** True if the game is currenty in fill mode */
   isFillMode: PropTypes.bool.isRequired,
   /** The error that the user clicked on */
-  selectedError: PropTypes.instanceOf(Error),
+  selectedError: PropTypes.instanceOf(SudokuError),
   onErrors: PropTypes.func.isRequired,
   lastSelectedNumber: PropTypes.number,
   /** Whether the game is paused or not. */

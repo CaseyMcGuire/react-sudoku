@@ -1,13 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './ErrorPanel.css';
-import {Error} from '../Board/Board.js';
+import SudokuError from '../../sudoku/SudokuError';
 
 /**
  * Panel that displays current outstanding errors to the user.
  */
 export default function ErrorPanel(props) {
-    //fix this
+  //fix this
   const errorDisplay = props.errors.map(error => <ErrorListing key={'(' + error.x + ',' + error.y + ')'}
                                                                error={error}
                                                                selectedError={props.selectedError}
@@ -45,9 +45,9 @@ function ErrorListing(props) {
 
 ErrorPanel.propTypes = {
   /** An array of {Error} objects that represent each error present in the board */
-  errors: PropTypes.arrayOf(PropTypes.instanceOf(Error)),
+  errors: PropTypes.arrayOf(PropTypes.instanceOf(SudokuError)),
   /** Callback that takes the error the user clicked on. */
   onErrorSelection: PropTypes.func,
   /** The error currently being displayed on the board */
-  selectedError: PropTypes.instanceOf(Error)
+  selectedError: PropTypes.instanceOf(SudokuError)
 };

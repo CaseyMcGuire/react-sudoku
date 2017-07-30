@@ -4,6 +4,7 @@ export const SQUARE_SELECTED = 'SQUARE_SELECTED';
 export const TOGGLE_PAUSE = 'TOGGLE_PAUSE';
 export const SET_IS_FILL_MODE = 'SET_IS_FILL_MODE';
 export const ON_ERROR_SELECTION = 'ON_ERROR_SELECTION';
+export const ON_ERRORS = 'ON_ERRORS';
 
 export function setBoardValue(change) {
   return {
@@ -36,6 +37,13 @@ export function onErrorSelection(error) {
   return {
     type: ON_ERROR_SELECTION,
     error
+  }
+}
+
+export function onErrors(errors) {
+  return {
+    type: ON_ERRORS,
+    errors
   }
 }
 

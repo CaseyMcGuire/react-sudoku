@@ -1,7 +1,8 @@
 import { combineReducers } from 'redux';
-import { SQUARE_CHANGE, SQUARE_SELECTED, TOGGLE_PAUSE, SET_IS_FILL_MODE, CANDIDATE_SQUARE_CHANGE } from './actions';
+import { SQUARE_CHANGE, SQUARE_SELECTED, TOGGLE_PAUSE, SET_IS_FILL_MODE, CANDIDATE_SQUARE_CHANGE, ON_ERRORS, ON_ERROR_SELECTION } from './actions';
+import { deepCopyArray } from './util/ArrayUtil';
 
-function currentBoard(state = getEmptyBoard(), action) {
+function currentBoard(state = getInitialBoard(), action) {
   switch(action.type) {
     case SQUARE_CHANGE:
       const boardCopy = deepCopyArray(state);
@@ -25,21 +26,11 @@ function candidateBoard(state = getEmptyCandidateBoard(), action) {
       const copy = deepCopyArray(state);
       const row = action.change.y;
       const column = action.change.x;
-      const adjustedValue = action.change.value - 1;
+      const adjustedValue = action.change.value - 1;//minus one to account for 0-indexing of array
       copy[row][column][adjustedValue] = !copy[row][column][adjustedValue];
       return copy;
   }
   return state;
-}
-
-function deepCopyArray(array) {
-  return array.map((value) => {
-    if (value instanceof Array) {
-      return deepCopyArray(value);
-    } else {
-      return value;
-    }
-  })
 }
 
 function isFillMode(state = true, action) {
@@ -68,28 +59,31 @@ function selectedSquare(state = null, action) {
 
 function errors(state = [], action) {
   switch(action.type) {
-    case SQUARE_CHANGE:
-      //TODO: implement me!
-      return state;
+    case ON_ERRORS:
+      return action.errors;
   }
   return state;
 }
 
 
 function selectedError(state = null, action) {
-  return state;
-}
-
-// (row, col)
-function getEmptyBoard(initialBoard) {
-  const board = Array(9).fill(null);
-  for (let i = 0; i < board.length; i++) {
-    board[i] = Array(9).fill(null);
-    for (let j = 0; j < board[i].length; j++) {
-      board[i][j] = "";
-    }
+  switch(action.type) {
+    case ON_ERROR_SELECTION:
+      //if the user clicked on the same error they're already viewing, then
+      //toggle off the error
+      if (state !== null && state.equals(action.error)) {
+        return null;
+      }
+      return action.error;
+    case SQUARE_CHANGE:
+      const selectedErrorSquareChanged = state !== null &&
+                                         action.change.x === state.x &&
+                                         action.change.y === state.y;
+      if (selectedErrorSquareChanged) {
+        return null;
+      }
   }
-  return board;
+  return state;
 }
 
 function getInitialBoard() {
