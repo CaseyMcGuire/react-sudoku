@@ -4,6 +4,7 @@
 	height: 31%;
 	vertical-align: top;
 	width: 190px;
+	overflow: auto;
 }
 
 .error-list {

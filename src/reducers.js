@@ -26,8 +26,13 @@ function candidateBoard(state = getEmptyCandidateBoard(), action) {
       const copy = deepCopyArray(state);
       const row = action.change.y;
       const column = action.change.x;
-      const adjustedValue = action.change.value - 1;//minus one to account for 0-indexing of array
-      copy[row][column][adjustedValue] = !copy[row][column][adjustedValue];
+      const clearButtonWasPressed = action.change.value === '';
+      if (clearButtonWasPressed) {
+        copy[row][column] = new Array(9).fill(false);
+      } else {
+        const adjustedValue = action.change.value - 1;//minus one to account for 0-indexing of array
+        copy[row][column][adjustedValue] = !copy[row][column][adjustedValue];
+      }
       return copy;
   }
   return state;
