@@ -28,17 +28,17 @@ export default function ErrorPanel(props) {
 }
 
 
-function ErrorListing(props) {
+function ErrorListing({ selectedError, error, onErrorSelection }) {
   let errorStyling;
-  if (Object.is(props.selectedError, props.error)) {
+  if (Object.is(selectedError, error)) {
     errorStyling = " selected-error-listing";
   }
   else {
     errorStyling = "";
   }
   return (
-    <li className={"error-listing" + errorStyling} onClick={() => props.onErrorSelection(props.error)}>
-      column: {props.error.x} row: {props.error.y}
+    <li className={"error-listing" + errorStyling} onClick={() => onErrorSelection(error)}>
+      column: {error.x} row: {error.y}
     </li>
   );
 }

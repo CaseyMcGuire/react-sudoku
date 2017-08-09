@@ -29,7 +29,7 @@ export default class SudokuError {
   }
 
   equals(other) {
-    if (other == null) {
+    if (!(other instanceof SudokuError)) {
       return false;
     }
 

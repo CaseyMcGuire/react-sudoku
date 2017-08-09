@@ -76,7 +76,8 @@ function selectedError(state = null, action) {
     case ON_ERROR_SELECTION:
       //if the user clicked on the same error they're already viewing, then
       //toggle off the error
-      if (state !== null && state.equals(action.error)) {
+      const sameAsCurrentError = state !== null && state.equals(action.error);
+      if (sameAsCurrentError) {
         return null;
       }
       return action.error;

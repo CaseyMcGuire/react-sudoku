@@ -1,23 +1,20 @@
 import Conflict from './Conflict';
 import Errors from './Errors';
 import SudokuError from './SudokuError';
+
+
 export default class SudokuBoard {
 
   /**
-   *
-   * @param {Array<Array<String>>} board
-   * @param {Array<Array<String>>} initialBoard
+   * @param {Array<Array<String>>} board The current state of the sudoku board
+   * @param {Array<Array<String>>} initialBoard The state of the sudoku board at the beginning of the game
    */
   constructor(board, initialBoard) {
     this.board = board;
     this.initialBoard = initialBoard;
   }
 
-  /**
-   * Return all errors currently present in the board.
-   *
-   * @return {Errors}
-   */
+  /** @return {Errors} All errors currently present in the board. */
   getErrors() {
     let errors = new Errors();
     for (let y = 0; y < this.board.length; y++) {
@@ -36,8 +33,12 @@ export default class SudokuBoard {
     return errors;
   }
 
-  //TODO: The code to check rows and columns is super similar... See if the logic
-  //can be combined somehow...
+
+  /**
+   * @param {number} x The x-coordinate of the square to check
+   * @param {number} y The y-coordinate of the square to check.
+   * @returns {Array<Conflict>} All row conflicts for the given square.
+   */
   getRowConflicts(x, y) {
     const currentNumber = this.getBoardValue(x, y);
     const errors = [];
@@ -59,6 +60,11 @@ export default class SudokuBoard {
     return errors;
   }
 
+  /**
+   * @param {number} x The x-coordinate of the square to check
+   * @param {number} y The y-coordinate of the square to check.
+   * @returns {Array<Conflict>} All column conflicts for the given square.
+   */
   getColumnConflicts(x, y) {
     const currentNumber = this.getBoardValue(x, y);
     const errors = [];
@@ -77,6 +83,11 @@ export default class SudokuBoard {
     return errors;
   }
 
+  /**
+   * @param {number} x The x-coordinate of the square to check
+   * @param {number} y The y-coordinate of the square to check.
+   * @returns {Array<Conflict>} All region conflicts for the given square.
+   */
   getRegionConflicts(x, y) {
     const currentNumber = this.getBoardValue(x, y);
     const errors = [];

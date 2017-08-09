@@ -7,10 +7,6 @@ export default class Errors {
     this.errors.push(error)
   }
 
-  hasError(x, y) {
-    return this.getError(x, y) !== null;
-  }
-
   getError(x, y) {
     for (let error of this.errors) {
       if (error.x === x && error.y === y) {

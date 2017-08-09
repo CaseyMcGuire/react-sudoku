@@ -9,6 +9,9 @@ export default class Conflict {
   }
 
   equals(other) {
+    if (!(other instanceof Conflict)) {
+      return false;
+    }
     return this.x === other.x && this.y === other.y;
   }
 }
